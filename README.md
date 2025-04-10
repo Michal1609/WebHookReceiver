@@ -7,7 +7,7 @@
 
 ## 📋 Overview
 
-WebHook Receiver is a comprehensive solution for collecting, processing, and displaying notifications from various webhook sources on Windows systems. It provides a secure API endpoint for receiving webhooks from any service, and a user-friendly system tray application that displays real-time notifications to users.
+WebHook Receiver is a comprehensive solution for collecting, processing, and displaying notifications from various webhook sources on Windows and Android systems. It provides a secure API endpoint for receiving webhooks from any service, and user-friendly applications for both Windows and Android that display real-time notifications to users.
 
 **Perfect for:**
 - Monitoring CI/CD pipelines
@@ -20,7 +20,8 @@ This project consists of three applications that communicate in real-time:
 
 1. 🌐 **WebHookReceiverApi** - ASP.NET Core Web API application that receives webhooks and forwards them to clients using SignalR
 2. 💻 **WebHookNotifier** - Windows application that displays notifications based on received webhooks
-3. 🔑 **ApiKeyGenerator** - Tool for generating API keys for API security
+3. 📱 **WebHookNotifierAndroid** - Android application that displays notifications based on received webhooks
+4. 🔑 **ApiKeyGenerator** - Tool for generating API keys for API security
 
 ## ✨ Features
 
@@ -41,7 +42,9 @@ This project consists of three applications that communicate in real-time:
 - 💬 SignalR for real-time communication
 - 💻 WPF for Windows application
 - 🔔 Hardcodet.NotifyIcon.Wpf for system tray integration
-- 🗄️ Entity Framework Core for database access
+- 📱 Jetpack Compose for Android UI
+- 💬 Microsoft SignalR Java client for Android
+- 🗄️ Entity Framework Core and Room for database access
 - 📊 SQLite and SQL Server database support
 
 ## 📎 Project Structure
@@ -60,6 +63,12 @@ This project consists of three applications that communicate in real-time:
   - **Security/** - Encryption and security services
   - **Resources/** - Icons and other resources
 
+- 📱 **WebHookNotifierAndroid/** - Android application
+  - **data/** - Data models, repositories and database access
+  - **service/** - SignalR and notification services
+  - **ui/** - User interface components using Jetpack Compose
+  - **util/** - Utility classes for encryption, formatting, and export
+
 - 🔑 **ApiKeyGenerator/** - API key generator tool
   - Generates secure API keys
   - Updates API configuration file
@@ -70,7 +79,8 @@ This project consists of three applications that communicate in real-time:
 ### 📚 Requirements
 
 - .NET 9 SDK
-- Windows (for client application)
+- Windows (for Windows client application)
+- Android 7.0+ (API level 24+) for Android application
 
 ### 🌐 Running the API
 
@@ -87,6 +97,15 @@ The API will be available at `http://localhost:5017`.
 cd WebHookNotifier
 dotnet run
 ```
+
+### 📱 Building the Android Application
+
+```bash
+cd WebHookNotifierAndroid
+./gradlew assembleDebug
+```
+
+The APK will be available at `WebHookNotifierAndroid/app/build/outputs/apk/debug/app-debug.apk`
 
 ## 📝 Usage
 
@@ -158,6 +177,13 @@ To configure the database:
 - Notification settings are stored in `%AppData%\WebHookNotifier\settings.json`
 - SQLite database is stored in `%AppData%\WebHookNotifier\notifications.db`
 - SQL Server connection strings are encrypted using Windows Data Protection API
+
+#### Android Application
+
+- The API URL can be set in the application
+- Notification settings are stored in Android's DataStore
+- SQLite database is stored in the app's private storage
+- SQL Server connection strings are encrypted using Android's EncryptedSharedPreferences
 
 ## 🛠️ Development
 
