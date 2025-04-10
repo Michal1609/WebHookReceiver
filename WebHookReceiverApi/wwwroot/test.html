@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Webhook Tester</h1>
+    <p>Použijte tento formulář k testování webhook endpointu.</p>
+
+    <div class="form-group">
+        <label for="event">Událost:</label>
+        <input type="text" id="event" name="event" value="test_event">
+    </div>
+
+    <div class="form-group">
+        <label for="message">Zpráva:</label>
+        <input type="text" id="message" name="message" value="Toto je testovací zpráva">
+    </div>
+
+    <div class="form-group">
+        <label for="apiKey">API klíč:</label>
+        <input type="text" id="apiKey" name="apiKey" value="default-api-key-please-change-me">
+    </div>
+
+    <div class="form-group">
+        <label for="additionalData">Další data (JSON):</label>
+        <textarea id="additionalData" name="additionalData" rows="5">{"key1": "value1", "key2": "value2"}</textarea>
+    </div>
+
+    <button id="sendButton">Odeslat webhook</button>
+
+    <div>
+        <h3>Odpověď:</h3>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        document.getElementById('sendButton').addEventListener('click', async () => {
+            const event = document.getElementById('event').value;
+            const message = document.getElementById('message').value;
+            let additionalData = {};
+
+            try {
+                additionalData = JSON.parse(document.getElementById('additionalData').value);
+            } catch (e) {
+                alert('Chyba v JSON formátu dodatečných dat!');
+                return;
+            }
+
+            const webhookData = {
+                id: crypto.randomUUID(),
+                event: event,
+                message: message,
+                timestamp: new Date().toISOString(),
+                additionalData: additionalData
+            };
+
+            try {
+                const apiKey = document.getElementById('apiKey').value;
+                const response = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify(webhookData)
+                });
+
+                const responseData = await response.json();
+                document.getElementById('response').textContent = JSON.stringify(responseData, null, 2);
+            } catch (error) {
+                document.getElementById('response').textContent = 'Chyba: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
