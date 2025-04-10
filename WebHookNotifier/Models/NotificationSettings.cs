@@ -16,6 +16,9 @@ namespace WebHookNotifier.Models
         public int MaxQueuedNotifications { get; set; } = 5;
         public bool EnableNotificationSounds { get; set; } = true;
 
+        // Security settings
+        public bool EnableEncryption { get; set; } = true;
+
         // Singleton instance
         private static NotificationSettings? _instance;
         public static NotificationSettings Instance
@@ -68,14 +71,14 @@ namespace WebHookNotifier.Models
             try
             {
                 string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-                
+
                 // Create directory if it doesn't exist
                 string? directoryPath = Path.GetDirectoryName(SettingsFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
-                
+
                 File.WriteAllText(SettingsFilePath, json);
             }
             catch (Exception ex)

@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 using WebHookReceiverApi.Hubs;
 using WebHookReceiverApi.Models;
+using WebHookReceiverApi.Security;
 
 namespace WebHookReceiverApi.Controllers
 {
@@ -11,11 +14,13 @@ namespace WebHookReceiverApi.Controllers
     {
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly ILogger<WebhookController> _logger;
+        private readonly ApiKeySettings _apiKeySettings;
 
-        public WebhookController(IHubContext<NotificationHub> hubContext, ILogger<WebhookController> logger)
+        public WebhookController(IHubContext<NotificationHub> hubContext, ILogger<WebhookController> logger, IOptions<ApiKeySettings> apiKeySettings)
         {
             _hubContext = hubContext;
             _logger = logger;
+            _apiKeySettings = apiKeySettings.Value;
         }
 
         [HttpPost]
@@ -38,8 +43,26 @@ namespace WebHookReceiverApi.Controllers
                     webhookData.Timestamp = DateTime.UtcNow;
                 }
 
+                // Prepare data for sending
+                string dataToSend;
+
+                // Check if encryption is enabled in settings
+                if (_apiKeySettings.EnableEncryption)
+                {
+                    // Encrypt webhook data before sending
+                    string jsonData = JsonSerializer.Serialize(webhookData);
+                    dataToSend = EncryptionService.Encrypt(jsonData);
+                    _logger.LogInformation("Sending encrypted notification");
+                }
+                else
+                {
+                    // Send data without encryption
+                    dataToSend = JsonSerializer.Serialize(webhookData);
+                    _logger.LogInformation("Sending unencrypted notification");
+                }
+
                 // Send notification to all connected clients
-                await _hubContext.Clients.All.SendAsync("ReceiveNotification", webhookData);
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification", dataToSend);
 
                 return Ok(new { success = true, message = "Webhook received and processed" });
             }

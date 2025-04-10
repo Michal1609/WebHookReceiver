@@ -23,6 +23,7 @@ namespace WebHookNotifier
             MinSecondsBetweenNotificationsTextBox.Text = _settings.MinSecondsBetweenNotifications.ToString();
             MaxQueuedNotificationsTextBox.Text = _settings.MaxQueuedNotifications.ToString();
             EnableNotificationSoundsCheckBox.IsChecked = _settings.EnableNotificationSounds;
+            EnableEncryptionCheckBox.IsChecked = _settings.EnableEncryption;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -51,6 +52,7 @@ namespace WebHookNotifier
                 }
 
                 _settings.EnableNotificationSounds = EnableNotificationSoundsCheckBox.IsChecked ?? true;
+                _settings.EnableEncryption = EnableEncryptionCheckBox.IsChecked ?? true;
 
                 // Save settings to file
                 _settings.Save();

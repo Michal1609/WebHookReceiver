@@ -72,6 +72,17 @@ public partial class MainWindow : Window
         Activate();
     }
 
+    private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+    {
+        // Show settings window on double-click
+        ShowSettingsWindow();
+    }
+
+    private void NotifyIcon_TrayRightMouseDown(object sender, RoutedEventArgs e)
+    {
+        // Right-click is handled by the context menu
+    }
+
     private void NotifyIcon_BalloonTipClicked(object sender, RoutedEventArgs e)
     {
         Show();
@@ -116,6 +127,36 @@ public partial class MainWindow : Window
         }
     }
 
+    // Format notification message for better display
+    private static string FormatNotificationMessage(string message)
+    {
+        // Break long lines for better readability
+        if (message.Length > 80)
+        {
+            // Insert line breaks at logical points (after punctuation or spaces)
+            var result = new System.Text.StringBuilder();
+            int lineLength = 0;
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                char c = message[i];
+                result.Append(c);
+                lineLength++;
+
+                // If we've reached a good breaking point and the line is getting long
+                if (lineLength > 60 && (c == ' ' || c == '.' || c == ',' || c == ';' || c == ':'))
+                {
+                    result.Append(Environment.NewLine);
+                    lineLength = 0;
+                }
+            }
+
+            return result.ToString();
+        }
+
+        return message;
+    }
+
     public static void ShowBalloonTip(string title, string message, BalloonIcon icon)
     {
         Application.Current.Dispatcher.Invoke(() =>
@@ -129,11 +170,14 @@ public partial class MainWindow : Window
                 Console.WriteLine($"Notification sent: {title} - {message}");
                 if (_notifyIcon != null)
                 {
-                    // Shorten message for balloon tip (too long messages can cause problems)
-                    string shortMessage = message;
-                    if (shortMessage.Length > 200)
+                    // Format message for better display in balloon tip
+                    string formattedMessage = FormatNotificationMessage(message);
+
+                    // Set maximum length for notification (increased from 200 to 500 characters)
+                    string shortMessage = formattedMessage;
+                    if (shortMessage.Length > 500)
                     {
-                        shortMessage = shortMessage.Substring(0, 197) + "...";
+                        shortMessage = shortMessage.Substring(0, 497) + "...";
                     }
 
                     // Show notification with or without sound based on user preference

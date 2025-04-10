@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WebHookNotifier.Models;
+using WebHookNotifier.Security;
 
 namespace WebHookNotifier.Services
 {
@@ -28,9 +30,49 @@ namespace WebHookNotifier.Services
                     .WithAutomaticReconnect()
                     .Build();
 
-                _hubConnection.On<WebhookData>("ReceiveNotification", (data) =>
+                _hubConnection.On<string>("ReceiveNotification", (encryptedData) =>
                 {
-                    NotificationReceived?.Invoke(this, data);
+                    try
+                    {
+                        WebhookData? data;
+
+                        // Check if encryption is enabled in settings
+                        if (NotificationSettings.Instance.EnableEncryption)
+                        {
+                            // Decrypt the received data
+                            string decryptedJson = EncryptionService.Decrypt(encryptedData);
+
+                            // Deserialize the JSON data
+                            data = JsonSerializer.Deserialize<WebhookData>(decryptedJson);
+                        }
+                        else
+                        {
+                            // If encryption is disabled, try to deserialize directly
+                            try
+                            {
+                                data = JsonSerializer.Deserialize<WebhookData>(encryptedData);
+                            }
+                            catch
+                            {
+                                // If direct deserialization fails, try decryption as fallback
+                                string decryptedJson = EncryptionService.Decrypt(encryptedData);
+                                data = JsonSerializer.Deserialize<WebhookData>(decryptedJson);
+                            }
+                        }
+
+                        if (data != null)
+                        {
+                            NotificationReceived?.Invoke(this, data);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error: Received null data after deserialization");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error processing notification: {ex.Message}");
+                    }
                 });
 
                 _hubConnection.Closed += async (error) =>

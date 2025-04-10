@@ -58,7 +58,9 @@
                        ToolTipText="WebHook Notifier"
                        Visibility="Visible"
                        TrayBalloonTipClicked="NotifyIcon_BalloonTipClicked"
-                       TrayLeftMouseDown="NotifyIcon_TrayLeftMouseDown">
+                       TrayLeftMouseDown="NotifyIcon_TrayLeftMouseDown"
+                       TrayMouseDoubleClick="NotifyIcon_TrayMouseDoubleClick"
+                       TrayRightMouseDown="NotifyIcon_TrayRightMouseDown">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Open" Click="OpenMenuItem_Click"/>

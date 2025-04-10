@@ -14,13 +14,23 @@ public class WebhookControllerTests
 {
     private readonly Mock<IHubContext<NotificationHub>> _mockHubContext;
     private readonly Mock<ILogger<WebhookController>> _mockLogger;
+    private readonly Mock<IOptions<ApiKeySettings>> _mockApiKeySettings;
     private readonly WebhookController _controller;
 
     public WebhookControllerTests()
     {
         _mockHubContext = new Mock<IHubContext<NotificationHub>>();
         _mockLogger = new Mock<ILogger<WebhookController>>();
-        _controller = new WebhookController(_mockHubContext.Object, _mockLogger.Object);
+
+        // Setup API key settings with encryption enabled
+        _mockApiKeySettings = new Mock<IOptions<ApiKeySettings>>();
+        _mockApiKeySettings.Setup(x => x.Value).Returns(new ApiKeySettings
+        {
+            ApiKey = "test-api-key",
+            EnableEncryption = true
+        });
+
+        _controller = new WebhookController(_mockHubContext.Object, _mockLogger.Object, _mockApiKeySettings.Object);
     }
 
     [Fact]
