@@ -23,7 +23,7 @@ namespace WebHookReceiverApi.Controllers
         {
             try
             {
-                // Kontrola, zda data nejsou null
+                // Check if data is not null
                 if (webhookData == null)
                 {
                     _logger.LogWarning("Received null webhook data");
@@ -32,13 +32,13 @@ namespace WebHookReceiverApi.Controllers
 
                 _logger.LogInformation("Received webhook: {Event}", webhookData.Event);
 
-                // Přidání časového razítka, pokud není nastaveno
+                // Add timestamp if not set
                 if (webhookData.Timestamp == default)
                 {
                     webhookData.Timestamp = DateTime.UtcNow;
                 }
 
-                // Odeslání notifikace všem připojeným klientům
+                // Send notification to all connected clients
                 await _hubContext.Clients.All.SendAsync("ReceiveNotification", webhookData);
 
                 return Ok(new { success = true, message = "Webhook received and processed" });

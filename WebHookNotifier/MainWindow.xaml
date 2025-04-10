@@ -26,24 +26,24 @@
 
         <StackPanel Grid.Row="1" Margin="10">
             <TextBlock Text="Status:" FontWeight="Bold" Margin="0,0,0,5"/>
-            <TextBlock x:Name="StatusText" Text="Nepřipojeno" Margin="0,0,0,10"/>
+            <TextBlock x:Name="StatusText" Text="Disconnected" Margin="0,0,0,10"/>
 
             <TextBlock Text="Server URL:" FontWeight="Bold" Margin="0,0,0,5"/>
             <TextBox x:Name="ServerUrlTextBox" Text="http://localhost:5017/notificationHub" Margin="0,0,0,10"/>
 
-            <CheckBox x:Name="AutoStartCheckBox" Content="Spustit při startu Windows" Margin="0,0,0,10"/>
+            <CheckBox x:Name="AutoStartCheckBox" Content="Start with Windows" Margin="0,0,0,10"/>
 
-            <TextBlock Text="Poslední notifikace:" FontWeight="Bold" Margin="0,0,0,5"/>
-            <TextBlock x:Name="LastNotificationText" Text="Žádná" TextWrapping="Wrap"/>
+            <TextBlock Text="Last notification:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock x:Name="LastNotificationText" Text="None" TextWrapping="Wrap"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-            <Button x:Name="ConnectButton" Content="Připojit" Width="100" Margin="5" Click="ConnectButton_Click"/>
-            <Button x:Name="DisconnectButton" Content="Odpojit" Width="100" Margin="5" Click="DisconnectButton_Click" IsEnabled="False"/>
-            <Button x:Name="MinimizeButton" Content="Minimalizovat" Width="100" Margin="5" Click="MinimizeButton_Click"/>
+            <Button x:Name="ConnectButton" Content="Connect" Width="100" Margin="5" Click="ConnectButton_Click"/>
+            <Button x:Name="DisconnectButton" Content="Disconnect" Width="100" Margin="5" Click="DisconnectButton_Click" IsEnabled="False"/>
+            <Button x:Name="MinimizeButton" Content="Minimize" Width="100" Margin="5" Click="MinimizeButton_Click"/>
         </StackPanel>
 
-        <!-- Ikona v systémové liště -->
+        <!-- System tray icon -->
         <tb:TaskbarIcon x:Name="NotifyIcon"
                        IconSource="/bell.ico"
                        ToolTipText="WebHook Notifier"
@@ -52,9 +52,9 @@
                        TrayLeftMouseDown="NotifyIcon_TrayLeftMouseDown">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Otevřít" Click="OpenMenuItem_Click"/>
+                    <MenuItem Header="Open" Click="OpenMenuItem_Click"/>
                     <Separator/>
-                    <MenuItem Header="Ukončit" Click="ExitMenuItem_Click"/>
+                    <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

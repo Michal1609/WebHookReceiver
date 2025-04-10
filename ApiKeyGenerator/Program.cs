@@ -7,40 +7,40 @@ namespace ApiKeyGenerator;
 
 public class Program
 {
-    private const int API_KEY_LENGTH = 32; // 256 bitů
+    private const int API_KEY_LENGTH = 32; // 256 bits
     private const string CONFIG_FILE_PATH = "../WebHookReceiverApi/appsettings.json";
     private const string API_KEY_FILE = "apikey.txt";
 
     public static void Main(string[] args)
     {
         Console.WriteLine("=== WebHook API Key Generator ===");
-        Console.WriteLine("Tento nástroj vygeneruje nový API klíč pro WebHook Receiver API.");
+        Console.WriteLine("This tool will generate a new API key for WebHook Receiver API.");
         Console.WriteLine();
 
-        // Generování nového API klíče
+        // Generate new API key
         string apiKey = GenerateApiKey();
-        Console.WriteLine($"Vygenerován nový API klíč: {apiKey}");
+        Console.WriteLine($"Generated new API key: {apiKey}");
 
-        // Uložení API klíče do souboru
+        // Save API key to file
         SaveApiKeyToFile(apiKey);
 
-        // Aktualizace konfiguračního souboru API
+        // Update API configuration file
         if (UpdateApiConfig(apiKey))
         {
-            Console.WriteLine($"Konfigurační soubor API byl aktualizován.");
+            Console.WriteLine($"API configuration file has been updated.");
         }
         else
         {
-            Console.WriteLine($"Konfigurační soubor API nebyl nalezen na cestě: {CONFIG_FILE_PATH}");
-            Console.WriteLine($"Prosím, přidejte následující řádek do sekce 'AppSettings' v konfiguračním souboru API:");
+            Console.WriteLine($"API configuration file not found at path: {CONFIG_FILE_PATH}");
+            Console.WriteLine($"Please add the following line to the 'AppSettings' section in the API configuration file:");
             Console.WriteLine($"\"ApiKey\": \"{apiKey}\"");
         }
 
         Console.WriteLine();
-        Console.WriteLine("Pro použití tohoto API klíče v požadavcích na webhook přidejte následující hlavičku:");
+        Console.WriteLine("To use this API key in webhook requests, add the following header:");
         Console.WriteLine($"X-API-Key: {apiKey}");
         Console.WriteLine();
-        Console.WriteLine("Stiskněte libovolnou klávesu pro ukončení...");
+        Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
     }
 
@@ -64,11 +64,11 @@ public class Program
         try
         {
             File.WriteAllText(API_KEY_FILE, apiKey);
-            Console.WriteLine($"API klíč byl uložen do souboru: {Path.GetFullPath(API_KEY_FILE)}");
+            Console.WriteLine($"API key has been saved to file: {Path.GetFullPath(API_KEY_FILE)}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Chyba při ukládání API klíče do souboru: {ex.Message}");
+            Console.WriteLine($"Error saving API key to file: {ex.Message}");
         }
     }
 
@@ -83,10 +83,10 @@ public class Program
         {
             string configContent = File.ReadAllText(CONFIG_FILE_PATH);
 
-            // Jednoduchá náhrada - v reálném projektu by bylo lepší použít JSON parser
+            // Simple replacement - in a real project it would be better to use a JSON parser
             if (configContent.Contains("\"ApiKey\":"))
             {
-                // Nahrazení existujícího klíče
+                // Replace existing key
                 configContent = System.Text.RegularExpressions.Regex.Replace(
                     configContent,
                     "\"ApiKey\":\\s*\"[^\"]*\"",
@@ -94,7 +94,7 @@ public class Program
             }
             else
             {
-                // Přidání nového klíče do sekce AppSettings
+                // Add new key to AppSettings section
                 int appSettingsIndex = configContent.IndexOf("\"AppSettings\": {");
                 if (appSettingsIndex >= 0)
                 {
@@ -106,7 +106,7 @@ public class Program
                 }
                 else
                 {
-                    // Přidání nové sekce AppSettings
+                    // Add new AppSettings section
                     int rootOpenBraceIndex = configContent.IndexOf('{');
                     if (rootOpenBraceIndex >= 0)
                     {
@@ -120,7 +120,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Chyba při aktualizaci konfiguračního souboru: {ex.Message}");
+            Console.WriteLine($"Error updating configuration file: {ex.Message}");
             return false;
         }
     }

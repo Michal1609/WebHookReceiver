@@ -8,13 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
-// Přidání SignalR
+// Add SignalR
 builder.Services.AddSignalR();
 
-// Konfigurace API klíče
+// API key configuration
 builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("AppSettings"));
 
-// Přidání CORS
+// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
@@ -37,19 +37,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Použití CORS
+// Use CORS
 app.UseCors("CorsPolicy");
 
-// Povolení statických souborů
+// Enable static files
 app.UseStaticFiles();
 
-// Použití API klíče pro autentizaci
+// Use API key authentication
 app.UseApiKeyAuth();
 
-// Mapování controllerů
+// Map controllers
 app.MapControllers();
 
-// Mapování SignalR hubu
+// Map SignalR hub
 app.MapHub<WebHookReceiverApi.Hubs.NotificationHub>("/notificationHub");
 
 app.Run();

@@ -25,7 +25,7 @@ public partial class MainWindow : Window
         string hubUrl = ServerUrlTextBox.Text.Trim();
         if (string.IsNullOrEmpty(hubUrl))
         {
-            MessageBox.Show("Zadejte URL serveru", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Enter server URL", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -34,13 +34,13 @@ public partial class MainWindow : Window
             _notificationService = new NotificationService(hubUrl);
             _notificationService.Start();
 
-            StatusText.Text = "Připojeno";
+            StatusText.Text = "Connected";
             ConnectButton.IsEnabled = false;
             DisconnectButton.IsEnabled = true;
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Chyba při připojování: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Connection error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -51,7 +51,7 @@ public partial class MainWindow : Window
             _notificationService.Stop();
             _notificationService = null;
 
-            StatusText.Text = "Nepřipojeno";
+            StatusText.Text = "Disconnected";
             ConnectButton.IsEnabled = true;
             DisconnectButton.IsEnabled = false;
         }
@@ -102,10 +102,10 @@ public partial class MainWindow : Window
         {
             try
             {
-                // Zobrazení notifikace v systémové liště
+                // Display notification in system tray
                 if (_notifyIcon != null)
                 {
-                    // Zkrácení zprávy pro balloon tip (příliš dlouhé zprávy mohou způsobit problémy)
+                    // Shorten message for balloon tip (too long messages can cause problems)
                     string shortMessage = message;
                     if (shortMessage.Length > 200)
                     {
@@ -113,14 +113,14 @@ public partial class MainWindow : Window
                     }
 
                     _notifyIcon.ShowBalloonTip(title, shortMessage, icon);
-                    Console.WriteLine($"Notifikace odeslána: {title} - {shortMessage}");
+                    Console.WriteLine($"Notification sent: {title} - {shortMessage}");
                 }
                 else
                 {
-                    Console.WriteLine("NotifyIcon je null, nelze zobrazit notifikaci");
+                    Console.WriteLine("NotifyIcon is null, cannot display notification");
                 }
 
-                // Aktualizace poslední notifikace v UI, pokud je okno otevřené
+                // Update last notification in UI if window is open
                 if (Application.Current.MainWindow is MainWindow mainWindow)
                 {
                     mainWindow.LastNotificationText.Text = $"{title}: {message}";
@@ -128,8 +128,8 @@ public partial class MainWindow : Window
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Chyba při zobrazování notifikace: {ex.Message}");
-                MessageBox.Show($"Chyba při zobrazování notifikace: {ex.Message}", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine($"Error displaying notification: {ex.Message}");
+                MessageBox.Show($"Error displaying notification: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         });
     }

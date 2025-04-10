@@ -1,115 +1,132 @@
-# WebHook Receiver
+# 🔔 WebHook Receiver
 
-Tento projekt se skládá ze tří aplikací, které spolu komunikují v reálném čase:
+![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![SignalR](https://img.shields.io/badge/SignalR-2C2D72?style=for-the-badge&logo=microsoft&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
-1. **WebHookReceiverApi** - ASP.NET Core Web API aplikace, která přijímá webhooky a předává je klientům pomocí SignalR
-2. **WebHookNotifier** - Windows aplikace, která zobrazuje notifikace na základě přijatých webhooků
-3. **ApiKeyGenerator** - Nástroj pro generování API klíčů pro zabezpečení API
+This project consists of three applications that communicate in real-time:
 
-## Technologie
+1. 🌐 **WebHookReceiverApi** - ASP.NET Core Web API application that receives webhooks and forwards them to clients using SignalR
+2. 💻 **WebHookNotifier** - Windows application that displays notifications based on received webhooks
+3. 🔑 **ApiKeyGenerator** - Tool for generating API keys for API security
 
-- .NET 9
-- ASP.NET Core Web API
-- SignalR pro real-time komunikaci
-- WPF pro Windows aplikaci
-- Hardcodet.NotifyIcon.Wpf pro systémovou lištu
+## ✨ Features
 
-## Struktura projektu
+- 🔔 Real-time notifications for webhooks
+- 🔒 Secure API with API key authentication
+- 💻 System tray integration with custom icon
+- 💯 Comprehensive test coverage
+- 📚 Detailed documentation
 
-- **WebHookReceiverApi/** - API projekt
-  - **Controllers/** - Controllery pro API
-  - **Hubs/** - SignalR huby
-  - **Middleware/** - Middleware pro ověřování API klíče
-  - **Models/** - Datové modely
-  - **wwwroot/** - Statické soubory (včetně testovací HTML stránky)
+## 💻 Technologies
 
-- **WebHookNotifier/** - Windows aplikace
-  - **Models/** - Datové modely
-  - **Services/** - Služby pro komunikaci a notifikace
-  - **Resources/** - Ikony a další zdroje
+- 🔥 .NET 9
+- 🌐 ASP.NET Core Web API
+- 💬 SignalR for real-time communication
+- 💻 WPF for Windows application
+- 🔔 Hardcodet.NotifyIcon.Wpf for system tray integration
 
-- **ApiKeyGenerator/** - Nástroj pro generování API klíčů
-  - Generuje bezpečné API klíče
-  - Aktualizuje konfigurační soubor API
-  - Ukládá vygenerovaný klíč do souboru
+## 📎 Project Structure
 
-## Instalace a spuštění
+- 🌐 **WebHookReceiverApi/** - API project
+  - **Controllers/** - API controllers
+  - **Hubs/** - SignalR hubs
+  - **Middleware/** - API key authentication middleware
+  - **Models/** - Data models
+  - **wwwroot/** - Static files (including test HTML page)
 
-### Požadavky
+- 💻 **WebHookNotifier/** - Windows application
+  - **Models/** - Data models
+  - **Services/** - Communication and notification services
+  - **Resources/** - Icons and other resources
+
+- 🔑 **ApiKeyGenerator/** - API key generator tool
+  - Generates secure API keys
+  - Updates API configuration file
+  - Saves generated key to a file
+
+## 📍 Installation and Running
+
+### 📚 Requirements
 
 - .NET 9 SDK
-- Windows (pro klientskou aplikaci)
+- Windows (for client application)
 
-### Spuštění API
+### 🌐 Running the API
 
 ```bash
 cd WebHookReceiverApi
 dotnet run
 ```
 
-API bude dostupné na adrese `http://localhost:5017`.
+The API will be available at `http://localhost:5017`.
 
-### Spuštění Windows aplikace
+### 💻 Running the Windows Application
 
 ```bash
 cd WebHookNotifier
 dotnet run
 ```
 
-## Použití
+## 📝 Usage
 
-### Zabezpečení API klíčem
+### 🔑 API Key Security
 
-API je zabezpečeno pomocí API klíče. Pro generování nového API klíče použijte nástroj ApiKeyGenerator:
+The API is secured using API keys. To generate a new API key, use the ApiKeyGenerator tool:
 
 ```bash
 cd ApiKeyGenerator
 dotnet run
 ```
 
-Tento nástroj vygeneruje nový API klíč a aktualizuje konfigurační soubor API. Vygenerovaný klíč je také uložen do souboru `apikey.txt`.
+This tool generates a new API key and updates the API configuration file. The generated key is also saved to the `apikey.txt` file.
 
-Při volání API je nutné přidat hlavičku `X-API-Key` s platnou hodnotou API klíče.
+When calling the API, you need to add the `X-API-Key` header with a valid API key value.
 
-### Testování webhooků
+### 💬 Testing Webhooks
 
-1. Spusťte API projekt
-2. Otevřete v prohlížeči `http://localhost:5017/test.html`
-3. Vyplňte formulář včetně API klíče a odešlete webhook
-4. Spusťte Windows aplikaci a připojte se k API
-5. Po odeslání webhooků se zobrazí notifikace v systémové liště
+1. Start the API project
+2. Open `http://localhost:5017/test.html` in your browser
+3. Fill out the form including the API key and submit the webhook
+4. Start the Windows application and connect to the API
+5. After sending webhooks, notifications will appear in the system tray
 
-### Konfigurace
+### ⚙️ Configuration
 
 #### API
 
-- Porty a další nastavení lze upravit v souboru `WebHookReceiverApi/Properties/launchSettings.json`
-- API klíč je uložen v souboru `WebHookReceiverApi/appsettings.json` v sekci `AppSettings.ApiKey`
+- Ports and other settings can be modified in the `WebHookReceiverApi/Properties/launchSettings.json` file
+- The API key is stored in the `WebHookReceiverApi/appsettings.json` file in the `AppSettings.ApiKey` section
 
-#### Windows aplikace
+#### Windows Application
 
-- URL API lze nastavit v aplikaci
+- The API URL can be set in the application
 
-## Vývoj
+## 🛠️ Development
 
-### Přidání nových typů webhooků
+### ➕ Adding New Webhook Types
 
-1. Upravte model `WebhookData` podle potřeby
-2. Implementujte zpracování nových typů v `WebhookController`
+1. Modify the `WebhookData` model as needed
+2. Implement processing of new types in `WebhookController`
 
-### Úprava notifikací
+### 🔔 Customizing Notifications
 
-Úpravy zobrazení notifikací lze provést v třídě `NotificationService` v projektu Windows aplikace.
+Notification display customizations can be made in the `NotificationService` class in the Windows application project.
 
-## Testování
+## 🚨 Testing
 
-Projekt obsahuje jednotkové testy pro API. Spuštění testů:
+The project includes unit tests for the API. To run the tests:
 
 ```bash
 cd WebHookReceiverApiTests
 dotnet test
 ```
 
-## Licence
+## 👮 License
 
-Tento projekt je licencován pod MIT licencí.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Credits
+
+This project was developed by [Augment](https://augmentcode.com/) - an AI-powered coding assistant.

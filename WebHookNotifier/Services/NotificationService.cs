@@ -16,7 +16,7 @@ namespace WebHookNotifier.Services
 
         private void OnNotificationReceived(object? sender, WebhookData data)
         {
-            // Zajistíme, že notifikace se zobrazí v UI vlákně
+            // Ensure notification is displayed in UI thread
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ShowNotification(data);
@@ -25,23 +25,23 @@ namespace WebHookNotifier.Services
 
         private void ShowNotification(WebhookData data)
         {
-            // Vytvoření textu notifikace
+            // Create notification text
             string title = $"Webhook: {data.Event}";
-            string message = data.Message ?? "Bez zprávy";
+            string message = data.Message ?? "No message";
 
             if (data.AdditionalData != null && data.AdditionalData.Count > 0)
             {
-                message += "\n\nDodatečná data:";
+                message += "\n\nAdditional data:";
                 foreach (var item in data.AdditionalData)
                 {
                     message += $"\n{item.Key}: {item.Value}";
                 }
             }
 
-            // Zobrazení notifikace pomocí systémové lišty
+            // Display notification using system tray
             MainWindow.ShowBalloonTip(title, message, Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
 
-            // Záložní metoda pro zobrazení notifikace - MessageBox pro testování
+            // Fallback method for displaying notification - MessageBox for testing
             MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 

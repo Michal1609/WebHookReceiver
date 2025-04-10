@@ -22,7 +22,7 @@ namespace WebHookReceiverApi.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // Pokud jde o SignalR hub nebo testovací endpoint, přeskočíme ověření
+            // If it's a SignalR hub or test endpoint, skip verification
             if (context.Request.Path.StartsWithSegments("/notificationHub") ||
                 context.Request.Path.StartsWithSegments("/test.html") ||
                 context.Request.Method == "GET")
@@ -31,30 +31,30 @@ namespace WebHookReceiverApi.Middleware
                 return;
             }
 
-            // Kontrola API klíče v hlavičce
+            // Check API key in header
             if (!context.Request.Headers.TryGetValue(API_KEY_HEADER_NAME, out var extractedApiKey))
             {
-                _logger.LogWarning("API klíč chybí v požadavku");
+                _logger.LogWarning("API key missing in request");
                 context.Response.StatusCode = 401; // Unauthorized
-                await context.Response.WriteAsJsonAsync(new { message = "API klíč je vyžadován" });
+                await context.Response.WriteAsJsonAsync(new { message = "API key is required" });
                 return;
             }
 
-            // Ověření API klíče
+            // Verify API key
             if (!_apiKeySettings.ApiKey.Equals(extractedApiKey))
             {
-                _logger.LogWarning("Neplatný API klíč");
+                _logger.LogWarning("Invalid API key");
                 context.Response.StatusCode = 401; // Unauthorized
-                await context.Response.WriteAsJsonAsync(new { message = "Neplatný API klíč" });
+                await context.Response.WriteAsJsonAsync(new { message = "Invalid API key" });
                 return;
             }
 
-            // Pokud je API klíč platný, pokračujeme dál
+            // If API key is valid, continue
             await _next(context);
         }
     }
 
-    // Extension metoda pro snadnější registraci middleware
+    // Extension method for easier middleware registration
     public static class ApiKeyAuthMiddlewareExtensions
     {
         public static IApplicationBuilder UseApiKeyAuth(this IApplicationBuilder builder)
