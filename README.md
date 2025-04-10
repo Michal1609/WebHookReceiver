@@ -5,6 +5,17 @@
 ![SignalR](https://img.shields.io/badge/SignalR-2C2D72?style=for-the-badge&logo=microsoft&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
+## 📋 Overview
+
+WebHook Receiver is a comprehensive solution for collecting, processing, and displaying notifications from various webhook sources on Windows systems. It provides a secure API endpoint for receiving webhooks from any service, and a user-friendly system tray application that displays real-time notifications to users.
+
+**Perfect for:**
+- Monitoring CI/CD pipelines
+- Tracking application events and alerts
+- Receiving notifications from IoT devices
+- Integrating with third-party services that support webhooks (GitHub, Slack, etc.)
+- Creating custom notification systems for your applications
+
 This project consists of three applications that communicate in real-time:
 
 1. 🌐 **WebHookReceiverApi** - ASP.NET Core Web API application that receives webhooks and forwards them to clients using SignalR
