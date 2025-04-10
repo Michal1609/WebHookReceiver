@@ -27,6 +27,10 @@ This project consists of three applications that communicate in real-time:
 - 🔔 Real-time notifications for webhooks
 - 🔒 Secure API with API key authentication
 - 💻 System tray integration with custom icon
+- 📊 Notification history with search and filtering
+- 📁 Export history to CSV and JSON formats
+- 🗄️ Support for SQLite and SQL Server databases
+- 🔐 Secure connection string storage with encryption
 - 💯 Comprehensive test coverage
 - 📚 Detailed documentation
 
@@ -37,6 +41,8 @@ This project consists of three applications that communicate in real-time:
 - 💬 SignalR for real-time communication
 - 💻 WPF for Windows application
 - 🔔 Hardcodet.NotifyIcon.Wpf for system tray integration
+- 🗄️ Entity Framework Core for database access
+- 📊 SQLite and SQL Server database support
 
 ## 📎 Project Structure
 
@@ -50,6 +56,8 @@ This project consists of three applications that communicate in real-time:
 - 💻 **WebHookNotifier/** - Windows application
   - **Models/** - Data models
   - **Services/** - Communication and notification services
+  - **Data/** - Database context and repositories
+  - **Security/** - Encryption and security services
   - **Resources/** - Icons and other resources
 
 - 🔑 **ApiKeyGenerator/** - API key generator tool
@@ -103,6 +111,40 @@ When calling the API, you need to add the `X-API-Key` header with a valid API ke
 4. Start the Windows application and connect to the API
 5. After sending webhooks, notifications will appear in the system tray
 
+### 📊 Notification History
+
+The application includes a comprehensive notification history system that allows you to:
+
+- View all received notifications in a searchable, filterable list
+- See detailed information about each notification
+- Export history to CSV or JSON formats
+- Configure database storage options
+
+#### Using the History Feature
+
+1. Click the "View History" button in the main window or select "View History" from the system tray menu
+2. Use the search box to find specific notifications by content
+3. Filter by date range using the date pickers
+4. Filter by event type using the dropdown
+5. Click on any notification to view its details
+6. Use the export buttons to save history to CSV or JSON format
+
+#### Database Configuration
+
+The history system supports two database types:
+
+- **SQLite** (default): Local file-based database, perfect for individual users
+- **SQL Server**: Enterprise-grade database for multi-user or centralized deployments
+
+To configure the database:
+
+1. Open Settings from the main window or system tray menu
+2. Navigate to the History section
+3. Enable or disable history tracking
+4. Set the number of days to retain history
+5. Select your preferred database type
+6. For SQL Server, enter and test your connection string
+
 ### ⚙️ Configuration
 
 #### API
@@ -113,6 +155,9 @@ When calling the API, you need to add the `X-API-Key` header with a valid API ke
 #### Windows Application
 
 - The API URL can be set in the application
+- Notification settings are stored in `%AppData%\WebHookNotifier\settings.json`
+- SQLite database is stored in `%AppData%\WebHookNotifier\notifications.db`
+- SQL Server connection strings are encrypted using Windows Data Protection API
 
 ## 🛠️ Development
 
@@ -123,7 +168,24 @@ When calling the API, you need to add the `X-API-Key` header with a valid API ke
 
 ### 🔔 Customizing Notifications
 
-Notification display customizations can be made in the `NotificationService` class in the Windows application project.
+The application offers several ways to customize notifications:
+
+#### Notification Display
+
+- Notification display customizations can be made in the `NotificationService` class
+- Format and styling of notifications can be modified in the `FormatNotificationMessage` method in `MainWindow.xaml.cs`
+
+#### Rate Limiting
+
+To prevent notification overload, you can configure rate limiting in the Settings window:
+
+- Set minimum seconds between notifications
+- Set maximum number of queued notifications
+- Enable or disable notification sounds
+
+#### Security
+
+- Enable or disable encryption for data transmission between API and client
 
 ## 🚨 Testing
 
