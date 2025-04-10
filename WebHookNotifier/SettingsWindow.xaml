@@ -51,6 +51,42 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="History" Padding="10" Margin="0,10,0,0">
+                <StackPanel>
+                    <CheckBox x:Name="EnableHistoryTrackingCheckBox" Content="Enable notification history tracking" IsChecked="True" Margin="0,0,0,5"/>
+
+                    <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Keep history for days:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="HistoryRetentionDaysTextBox" Text="30" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+
+                    <TextBlock Margin="0,5,0,5" Text="Database Type:" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <RadioButton x:Name="SqliteRadioButton" Content="SQLite (local)" IsChecked="True" Margin="0,0,15,0" Checked="SqliteRadioButton_Checked"/>
+                        <RadioButton x:Name="SqlServerRadioButton" Content="SQL Server" Checked="SqlServerRadioButton_Checked"/>
+                    </StackPanel>
+
+                    <Grid x:Name="SqlServerConnectionGrid" Visibility="Collapsed" Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Connection String:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Grid.Column="1" x:Name="SqlServerConnectionStringTextBox" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <Button Grid.Column="2" Content="Test" x:Name="TestConnectionButton" Click="TestConnectionButton_Click" Padding="10,0"/>
+                    </Grid>
+
+                    <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" FontStyle="Italic" Foreground="Gray">
+                        Connection strings are stored securely using Windows Data Protection API.
+                    </TextBlock>
+                </StackPanel>
+            </GroupBox>
+
             <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Foreground="Gray">
                 Note: These settings help prevent notification overload when many webhooks are received in a short time.
             </TextBlock>

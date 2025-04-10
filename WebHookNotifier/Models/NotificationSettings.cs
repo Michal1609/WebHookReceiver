@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using WebHookNotifier.Security;
 
 namespace WebHookNotifier.Models
 {
@@ -18,6 +19,40 @@ namespace WebHookNotifier.Models
 
         // Security settings
         public bool EnableEncryption { get; set; } = true;
+
+        // History settings
+        public bool EnableHistoryTracking { get; set; } = true;
+        public int HistoryRetentionDays { get; set; } = 30;
+
+        // Database settings
+        public DatabaseType DatabaseType { get; set; } = DatabaseType.SQLite;
+        private string _encryptedSqlServerConnectionString = string.Empty;
+
+        // Property to safely get/set the encrypted connection string
+        public string SqlServerConnectionString
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_encryptedSqlServerConnectionString))
+                    return string.Empty;
+
+                return ConnectionStringProtection.DecryptConnectionString(_encryptedSqlServerConnectionString);
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    _encryptedSqlServerConnectionString = string.Empty;
+                else
+                    _encryptedSqlServerConnectionString = ConnectionStringProtection.EncryptConnectionString(value);
+            }
+        }
+
+        // This property is used for serialization to avoid exposing the decrypted connection string
+        public string EncryptedSqlServerConnectionString
+        {
+            get => _encryptedSqlServerConnectionString;
+            set => _encryptedSqlServerConnectionString = value;
+        }
 
         // Singleton instance
         private static NotificationSettings? _instance;

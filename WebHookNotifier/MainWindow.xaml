@@ -49,7 +49,10 @@
                 <Button x:Name="MinimizeButton" Content="Minimize" Width="100" Margin="5" Click="MinimizeButton_Click"/>
             </StackPanel>
 
-            <Button Grid.Row="1" x:Name="SettingsButton" Content="Notification Settings" Width="150" Margin="5,10,5,0" Click="SettingsButton_Click" HorizontalAlignment="Center"/>
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Vertical">
+                <Button x:Name="SettingsButton" Content="Notification Settings" Width="150" Margin="5,10,5,5" Click="SettingsButton_Click"/>
+                <Button x:Name="HistoryButton" Content="View History" Width="150" Margin="5,5,5,0" Click="HistoryButton_Click"/>
+            </StackPanel>
         </Grid>
 
         <!-- System tray icon -->
@@ -65,6 +68,7 @@
                 <ContextMenu>
                     <MenuItem Header="Open" Click="OpenMenuItem_Click"/>
                     <MenuItem Header="Settings" Click="SettingsMenuItem_Click"/>
+                    <MenuItem Header="View History" Click="HistoryMenuItem_Click"/>
                     <Separator/>
                     <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
                 </ContextMenu>

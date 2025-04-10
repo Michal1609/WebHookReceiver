@@ -1,6 +1,9 @@
 using System;
+using Microsoft.Data.SqlClient;
 using System.Windows;
+using Microsoft.Data.Sqlite;
 using WebHookNotifier.Models;
+using WebHookNotifier.Security;
 using MessageBox = System.Windows.MessageBox;
 
 namespace WebHookNotifier
@@ -24,6 +27,25 @@ namespace WebHookNotifier
             MaxQueuedNotificationsTextBox.Text = _settings.MaxQueuedNotifications.ToString();
             EnableNotificationSoundsCheckBox.IsChecked = _settings.EnableNotificationSounds;
             EnableEncryptionCheckBox.IsChecked = _settings.EnableEncryption;
+
+            // History settings
+            EnableHistoryTrackingCheckBox.IsChecked = _settings.EnableHistoryTracking;
+            HistoryRetentionDaysTextBox.Text = _settings.HistoryRetentionDays.ToString();
+
+            // Database settings
+            if (_settings.DatabaseType == DatabaseType.SQLite)
+            {
+                SqliteRadioButton.IsChecked = true;
+                SqlServerRadioButton.IsChecked = false;
+                SqlServerConnectionGrid.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                SqliteRadioButton.IsChecked = false;
+                SqlServerRadioButton.IsChecked = true;
+                SqlServerConnectionGrid.Visibility = Visibility.Visible;
+                SqlServerConnectionStringTextBox.Text = _settings.SqlServerConnectionString;
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -54,6 +76,34 @@ namespace WebHookNotifier
                 _settings.EnableNotificationSounds = EnableNotificationSoundsCheckBox.IsChecked ?? true;
                 _settings.EnableEncryption = EnableEncryptionCheckBox.IsChecked ?? true;
 
+                // History settings
+                _settings.EnableHistoryTracking = EnableHistoryTrackingCheckBox.IsChecked ?? true;
+
+                if (int.TryParse(HistoryRetentionDaysTextBox.Text, out int retentionDays) && retentionDays >= 1)
+                {
+                    _settings.HistoryRetentionDays = retentionDays;
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid number (at least 1) for history retention days.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Database settings
+                _settings.DatabaseType = SqliteRadioButton.IsChecked == true ? DatabaseType.SQLite : DatabaseType.SQLServer;
+
+                if (_settings.DatabaseType == DatabaseType.SQLServer)
+                {
+                    string connectionString = SqlServerConnectionStringTextBox.Text.Trim();
+                    if (string.IsNullOrEmpty(connectionString))
+                    {
+                        MessageBox.Show("Please enter a SQL Server connection string.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    _settings.SqlServerConnectionString = connectionString;
+                }
+
                 // Save settings to file
                 _settings.Save();
 
@@ -70,6 +120,46 @@ namespace WebHookNotifier
         {
             DialogResult = false;
             Close();
+        }
+
+        private void SqliteRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (SqlServerConnectionGrid != null)
+            {
+                SqlServerConnectionGrid.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void SqlServerRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (SqlServerConnectionGrid != null)
+            {
+                SqlServerConnectionGrid.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void TestConnectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            string connectionString = SqlServerConnectionStringTextBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                MessageBox.Show("Please enter a connection string.", "Test Connection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    MessageBox.Show("Connection successful!", "Test Connection", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Connection failed: {ex.Message}", "Test Connection", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Windows;
 using System.Windows.Forms;
+using WebHookNotifier.Data;
 using WebHookNotifier.Models;
 using WebHookNotifier.Services;
 using Application = System.Windows.Application;
@@ -16,11 +18,33 @@ public partial class MainWindow : Window
 {
     private NotificationService? _notificationService;
     private static TaskbarIcon? _notifyIcon;
+    private DatabaseService? _databaseService;
+    private NotificationHistoryService? _historyService;
 
     public MainWindow()
     {
         InitializeComponent();
         _notifyIcon = NotifyIcon;
+
+        // Initialize database services
+        InitializeDatabaseServices();
+    }
+
+    private void InitializeDatabaseServices()
+    {
+        try
+        {
+            // Initialize database service
+            _databaseService = new DatabaseService(NotificationSettings.Instance);
+            var dbContext = _databaseService.InitializeDatabase();
+
+            // Initialize history service
+            _historyService = new NotificationHistoryService(dbContext, NotificationSettings.Instance);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error initializing database: {ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void ConnectButton_Click(object sender, RoutedEventArgs e)
@@ -34,10 +58,10 @@ public partial class MainWindow : Window
 
         try
         {
-            _notificationService = new NotificationService(hubUrl);
+            _notificationService = new NotificationService(hubUrl, _historyService);
             _notificationService.Start();
 
-            StatusText.Text = "Connected";
+            StatusText.Text = $"Connected to {hubUrl}";
             ConnectButton.IsEnabled = false;
             DisconnectButton.IsEnabled = true;
         }
@@ -112,11 +136,41 @@ public partial class MainWindow : Window
         ShowSettingsWindow();
     }
 
+    private void HistoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        ShowHistoryWindow();
+    }
+
+    private void HistoryMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        ShowHistoryWindow();
+    }
+
     private void ShowSettingsWindow()
     {
         var settingsWindow = new SettingsWindow();
         settingsWindow.Owner = this;
         settingsWindow.ShowDialog();
+    }
+
+    private void ShowHistoryWindow()
+    {
+        try
+        {
+            if (_historyService == null)
+            {
+                MessageBox.Show("History service is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var historyWindow = new HistoryWindow(_historyService);
+            historyWindow.Owner = this;
+            historyWindow.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error showing history: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

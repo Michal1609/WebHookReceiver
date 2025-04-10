@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using WebHookNotifier.Data;
 using WebHookNotifier.Models;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
@@ -12,6 +13,7 @@ namespace WebHookNotifier.Services
     public class NotificationService
     {
         private readonly SignalRService _signalRService;
+        private readonly NotificationHistoryService? _historyService;
 
         // Rate limiting settings
         private TimeSpan _minTimeBetweenNotifications => TimeSpan.FromSeconds(NotificationSettings.Instance.MinSecondsBetweenNotifications);
@@ -21,10 +23,11 @@ namespace WebHookNotifier.Services
         private DateTime _lastNotificationTime = DateTime.MinValue;
         private bool _processingQueue = false;
 
-        public NotificationService(string hubUrl)
+        public NotificationService(string hubUrl, NotificationHistoryService? historyService = null)
         {
             _signalRService = new SignalRService(hubUrl);
             _signalRService.NotificationReceived += OnNotificationReceived;
+            _historyService = historyService;
         }
 
         private async void OnNotificationReceived(object? sender, WebhookData data)
@@ -97,6 +100,9 @@ namespace WebHookNotifier.Services
                     });
 
                     _lastNotificationTime = DateTime.Now;
+
+                    // Save to history if enabled
+                    await SaveToHistoryAsync(data);
                 }
             }
         }
@@ -134,6 +140,24 @@ namespace WebHookNotifier.Services
         public async void Stop()
         {
             await _signalRService.StopAsync();
+        }
+
+        /// <summary>
+        /// Saves a notification to the history database if history service is available
+        /// </summary>
+        private async Task SaveToHistoryAsync(WebhookData data)
+        {
+            if (_historyService != null && NotificationSettings.Instance.EnableHistoryTracking)
+            {
+                try
+                {
+                    await _historyService.AddNotificationAsync(data);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving notification to history: {ex.Message}");
+                }
+            }
         }
     }
 }
