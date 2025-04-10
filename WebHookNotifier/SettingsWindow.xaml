@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WebHookNotifier"
         mc:Ignorable="d"
-        Title="Notification Settings" Height="300" Width="400"
+        Title="Notification Settings" Height="400" Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
     <Grid Margin="15">

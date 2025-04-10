@@ -130,8 +130,24 @@ public partial class MainWindow : Window
     // Format notification message for better display
     private static string FormatNotificationMessage(string message)
     {
+        // Process JSON data to make it more readable
+        if (message.Contains("{") && message.Contains("}"))
+        {
+            try
+            {
+                // Try to format JSON more nicely
+                message = message.Replace("{\":", "{\r\n  \"")
+                               .Replace(",\":", ",\r\n  \"")
+                               .Replace("}", "\r\n}");
+            }
+            catch
+            {
+                // If formatting fails, continue with original message
+            }
+        }
+
         // Break long lines for better readability
-        if (message.Length > 80)
+        if (message.Length > 40) // Reduced from 80 to 40 for better display in notifications
         {
             // Insert line breaks at logical points (after punctuation or spaces)
             var result = new System.Text.StringBuilder();
@@ -144,7 +160,8 @@ public partial class MainWindow : Window
                 lineLength++;
 
                 // If we've reached a good breaking point and the line is getting long
-                if (lineLength > 60 && (c == ' ' || c == '.' || c == ',' || c == ';' || c == ':'))
+                // Reduced from 60 to 40 characters for better display in notifications
+                if (lineLength > 40 && (c == ' ' || c == '.' || c == ',' || c == ';' || c == ':'))
                 {
                     result.Append(Environment.NewLine);
                     lineLength = 0;
@@ -173,11 +190,12 @@ public partial class MainWindow : Window
                     // Format message for better display in balloon tip
                     string formattedMessage = FormatNotificationMessage(message);
 
-                    // Set maximum length for notification (increased from 200 to 500 characters)
+                    // Set maximum length for notification (increased from 200 to 800 characters)
+                    // Windows 10/11 notifications can display more text with proper formatting
                     string shortMessage = formattedMessage;
-                    if (shortMessage.Length > 500)
+                    if (shortMessage.Length > 800)
                     {
-                        shortMessage = shortMessage.Substring(0, 497) + "...";
+                        shortMessage = shortMessage.Substring(0, 797) + "...";
                     }
 
                     // Show notification with or without sound based on user preference
