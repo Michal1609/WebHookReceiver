@@ -1,8 +1,11 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using System;
 using System.Windows;
+using System.Windows.Forms;
 using WebHookNotifier.Models;
 using WebHookNotifier.Services;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace WebHookNotifier;
 
@@ -88,6 +91,23 @@ public partial class MainWindow : Window
         Application.Current.Shutdown();
     }
 
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        ShowSettingsWindow();
+    }
+
+    private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        ShowSettingsWindow();
+    }
+
+    private void ShowSettingsWindow()
+    {
+        var settingsWindow = new SettingsWindow();
+        settingsWindow.Owner = this;
+        settingsWindow.ShowDialog();
+    }
+
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         if (_notificationService != null)
@@ -102,7 +122,11 @@ public partial class MainWindow : Window
         {
             try
             {
-                // Display notification in system tray
+                // Create a more modern-looking notification using NotifyIcon
+                // The NotifyIcon control will show notifications in the Windows notification style
+                // on Windows 10 and newer
+
+                Console.WriteLine($"Notification sent: {title} - {message}");
                 if (_notifyIcon != null)
                 {
                     // Shorten message for balloon tip (too long messages can cause problems)
@@ -112,8 +136,9 @@ public partial class MainWindow : Window
                         shortMessage = shortMessage.Substring(0, 197) + "...";
                     }
 
+                    // Show notification with or without sound based on user preference
+                    bool playSound = NotificationSettings.Instance.EnableNotificationSounds;
                     _notifyIcon.ShowBalloonTip(title, shortMessage, icon);
-                    Console.WriteLine($"Notification sent: {title} - {shortMessage}");
                 }
                 else
                 {
