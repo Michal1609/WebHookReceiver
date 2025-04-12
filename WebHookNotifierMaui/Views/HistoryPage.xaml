@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WebHookNotifierMaui.Views.HistoryPage"
+             Title="Notification History">
+    
+    <Grid Padding="20" RowSpacing="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Label Grid.Row="0"
+               Text="Notification History"
+               FontSize="24"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <!-- Search and Filter Panel -->
+        <Grid Grid.Row="1" ColumnSpacing="10" RowSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Search Box -->
+            <Entry Grid.Row="0" Grid.Column="0"
+                   x:Name="SearchEntry"
+                   Placeholder="Search notifications..."
+                   Completed="SearchEntry_Completed" />
+            
+            <Button Grid.Row="0" Grid.Column="1"
+                    x:Name="SearchButton"
+                    Text="Search"
+                    Clicked="SearchButton_Clicked" />
+
+            <!-- Date Range -->
+            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Column="0" Text="From:" VerticalOptions="Center" />
+                <DatePicker Grid.Column="1" x:Name="FromDatePicker" />
+                
+                <Label Grid.Column="2" Text="To:" VerticalOptions="Center" />
+                <DatePicker Grid.Column="3" x:Name="ToDatePicker" />
+            </Grid>
+
+            <!-- Event Type Filter -->
+            <Picker Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                    x:Name="EventTypePicker"
+                    Title="Select event type" />
+        </Grid>
+
+        <!-- Notification List -->
+        <CollectionView Grid.Row="2"
+                        x:Name="NotificationsCollection"
+                        SelectionMode="Single"
+                        SelectionChanged="NotificationsCollection_SelectionChanged">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,5" Padding="10" BorderColor="LightGray">
+                        <Grid ColumnSpacing="10" RowSpacing="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="Event:" FontAttributes="Bold" />
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Event}" />
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Message:" FontAttributes="Bold" />
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Message}" LineBreakMode="WordWrap" />
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="Time:" FontAttributes="Bold" />
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding Timestamp, StringFormat='{0:yyyy-MM-dd HH:mm:ss}'}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="No notifications found" FontSize="18" TextColor="Gray" />
+                    <Label Text="Try changing your search criteria" FontSize="14" TextColor="Gray" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- Details Panel -->
+        <Frame Grid.Row="3" BorderColor="LightGray" Padding="10" IsVisible="{Binding IsDetailsVisible}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Notification Details" FontAttributes="Bold" FontSize="16" />
+                <ScrollView HeightRequest="150">
+                    <Label x:Name="DetailsLabel" Text="{Binding DetailsText}" />
+                </ScrollView>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Action Buttons -->
+        <HorizontalStackLayout Grid.Row="4" Spacing="10" HorizontalOptions="Center">
+            <Button x:Name="ExportCsvButton"
+                    Text="Export to CSV"
+                    Clicked="ExportCsvButton_Clicked" />
+            <Button x:Name="ExportJsonButton"
+                    Text="Export to JSON"
+                    Clicked="ExportJsonButton_Clicked" />
+            <Button x:Name="CloseButton"
+                    Text="Close"
+                    Clicked="CloseButton_Clicked" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

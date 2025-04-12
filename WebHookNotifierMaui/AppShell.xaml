@@ -8,9 +8,25 @@
     Shell.FlyoutBehavior="Flyout"
     Title="WebHook Notifier">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate views:MainPage}"
-        Route="MainPage" />
+    <FlyoutItem Title="Main">
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="History">
+        <ShellContent
+            Title="Notification History"
+            ContentTemplate="{DataTemplate views:HistoryPage}"
+            Route="HistoryPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Settings">
+        <ShellContent
+            Title="Settings"
+            ContentTemplate="{DataTemplate views:SettingsPage}"
+            Route="SettingsPage" />
+    </FlyoutItem>
 
 </Shell>

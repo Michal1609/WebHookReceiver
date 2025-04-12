@@ -3,11 +3,12 @@
 ![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
 ![SignalR](https://img.shields.io/badge/SignalR-2C2D72?style=for-the-badge&logo=microsoft&logoColor=white)
+![MAUI](https://img.shields.io/badge/MAUI-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
 ## 📋 Overview
 
-WebHook Receiver is a comprehensive solution for collecting, processing, and displaying notifications from various webhook sources on Windows and Android systems. It provides a secure API endpoint for receiving webhooks from any service, and user-friendly applications for both Windows and Android that display real-time notifications to users.
+WebHook Receiver is a comprehensive solution for collecting, processing, and displaying notifications from various webhook sources on Windows, Android, iOS, and macOS systems. It provides a secure API endpoint for receiving webhooks from any service, and user-friendly applications that display real-time notifications to users across multiple platforms.
 
 **Perfect for:**
 - Monitoring CI/CD pipelines
@@ -16,11 +17,11 @@ WebHook Receiver is a comprehensive solution for collecting, processing, and dis
 - Integrating with third-party services that support webhooks (GitHub, Slack, etc.)
 - Creating custom notification systems for your applications
 
-This project consists of three applications that communicate in real-time:
+This project consists of these applications that communicate in real-time:
 
 1. 🌐 **WebHookReceiverApi** - ASP.NET Core Web API application that receives webhooks and forwards them to clients using SignalR
-2. 💻 **WebHookNotifier** - Windows application that displays notifications based on received webhooks
-3. 📱 **WebHookNotifierAndroid** - Android application that displays notifications based on received webhooks
+2. 💻 **WebHookNotifier** - Windows desktop application (WPF) that displays notifications based on received webhooks
+3. 📱 **WebHookNotifierMaui** - Cross-platform application (.NET MAUI) for Windows, Android, iOS, and macOS
 4. 🔑 **ApiKeyGenerator** - Tool for generating API keys for API security
 
 ## ✨ Features
@@ -34,6 +35,14 @@ This project consists of three applications that communicate in real-time:
 - 🔐 Secure connection string storage with encryption
 - 💯 Comprehensive test coverage
 - 📚 Detailed documentation
+
+## 📚 Detailed Documentation
+
+For more detailed information, please refer to the following documentation:
+
+- [WebHookNotifierMaui Documentation](docs/WebHookNotifierMaui.md) - Detailed guide for the MAUI cross-platform application
+- [Configuration Guide](docs/Configuration.md) - Complete configuration options for all components
+- [Development Guide](docs/Development.md) - Information for developers who want to extend or modify the system
 
 ## 💻 Technologies
 
@@ -63,11 +72,13 @@ This project consists of three applications that communicate in real-time:
   - **Security/** - Encryption and security services
   - **Resources/** - Icons and other resources
 
-- 📱 **WebHookNotifierAndroid/** - Android application
-  - **data/** - Data models, repositories and database access
-  - **service/** - SignalR and notification services
-  - **ui/** - User interface components using Jetpack Compose
-  - **util/** - Utility classes for encryption, formatting, and export
+- 📱 **WebHookNotifierMaui/** - Cross-platform application (.NET MAUI)
+  - **Models/** - Data models
+  - **Services/** - Communication and notification services
+  - **Data/** - Database context and repositories
+  - **Views/** - User interface pages
+  - **Platforms/** - Platform-specific implementations
+  - **Resources/** - Icons, images, and other resources
 
 - 🔑 **ApiKeyGenerator/** - API key generator tool
   - Generates secure API keys
@@ -80,7 +91,7 @@ This project consists of three applications that communicate in real-time:
 
 - .NET 9 SDK
 - Windows (for Windows client application)
-- Android 7.0+ (API level 24+) for Android application
+- Android 7.0+ (API level 24+), iOS 15.0+, or macOS 11.0+ for MAUI application
 
 ### 🌐 Running the API
 
@@ -98,14 +109,31 @@ cd WebHookNotifier
 dotnet run
 ```
 
-### 📱 Building the Android Application
+### 📱 Running the MAUI Application
 
+For Windows:
 ```bash
-cd WebHookNotifierAndroid
-./gradlew assembleDebug
+cd WebHookNotifierMaui
+dotnet build -t:Run -f net9.0-windows10.0.19041.0
 ```
 
-The APK will be available at `WebHookNotifierAndroid/app/build/outputs/apk/debug/app-debug.apk`
+For Android:
+```bash
+cd WebHookNotifierMaui
+dotnet build -t:Run -f net9.0-android
+```
+
+For iOS:
+```bash
+cd WebHookNotifierMaui
+dotnet build -t:Run -f net9.0-ios
+```
+
+For macOS:
+```bash
+cd WebHookNotifierMaui
+dotnet build -t:Run -f net9.0-maccatalyst
+```
 
 ## 📝 Usage
 
@@ -178,12 +206,13 @@ To configure the database:
 - SQLite database is stored in `%AppData%\WebHookNotifier\notifications.db`
 - SQL Server connection strings are encrypted using Windows Data Protection API
 
-#### Android Application
+#### MAUI Application
 
 - The API URL can be set in the application
-- Notification settings are stored in Android's DataStore
-- SQLite database is stored in the app's private storage
-- SQL Server connection strings are encrypted using Android's EncryptedSharedPreferences
+- Notification settings are stored in the application's local storage
+- SQLite database is stored in the application's local storage
+- SQL Server connection strings are encrypted using platform-specific encryption
+- On Android, direct WebSockets can be used instead of SignalR for better performance
 
 ## 🛠️ Development
 

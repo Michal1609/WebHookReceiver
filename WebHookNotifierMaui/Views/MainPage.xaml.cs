@@ -225,9 +225,8 @@ namespace WebHookNotifierMaui.Views
                     return;
                 }
 
-                await DisplayAlert("History", "History view is not implemented yet.", "OK");
-                // TODO: Navigate to history page
-                // await Navigation.PushAsync(new HistoryPage(_historyService));
+                // Navigate to history page
+                await Navigation.PushAsync(new HistoryPage(_historyService));
             }
             catch (Exception ex)
             {
@@ -239,9 +238,8 @@ namespace WebHookNotifierMaui.Views
         {
             try
             {
-                await DisplayAlert("Settings", "Settings view is not implemented yet.", "OK");
-                // TODO: Navigate to settings page
-                // await Navigation.PushAsync(new SettingsPage());
+                // Navigate to settings page
+                await Navigation.PushAsync(new SettingsPage());
             }
             catch (Exception ex)
             {
