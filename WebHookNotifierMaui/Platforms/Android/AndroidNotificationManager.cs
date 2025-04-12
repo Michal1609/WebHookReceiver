@@ -64,9 +64,9 @@ namespace WebHookNotifierMaui.Platforms.Android
             var builder = new NotificationCompat.Builder(global::Android.App.Application.Context, ChannelId)
                 .SetContentTitle(title)
                 .SetContentText(message)
-                //.SetSmallIcon()
-                //.SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
+                .SetSmallIcon(global::Android.Resource.Drawable.IcDialogInfo)
                 .SetContentIntent(pendingIntent)
+                .SetPriority(NotificationCompat.PriorityHigh) // Vysoká priorita pro lepší viditelnost
                 .SetAutoCancel(true);
 
             // For longer messages, use big text style
