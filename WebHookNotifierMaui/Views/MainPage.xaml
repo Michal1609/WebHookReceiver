@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WebHookNotifierMaui.Views.MainPage"
+             Title="WebHook Notifier">
+
+    <Grid Padding="20" RowSpacing="20" ColumnSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Header -->
+        <Label Grid.Row="0" Grid.ColumnSpan="2"
+               Text="WebHook Notifier"
+               FontSize="24"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <!-- Server URL Input -->
+        <Entry Grid.Row="1" Grid.Column="0"
+               x:Name="ServerUrlEntry"
+               Placeholder="Enter server URL (e.g. http://localhost:5017/notificationHub)"
+               Text="{Binding ApiUrl}" />
+
+        <!-- Connect Button -->
+        <Button Grid.Row="1" Grid.Column="1"
+                x:Name="ConnectButton"
+                Text="Connect"
+                Clicked="ConnectButton_Clicked" />
+
+        <!-- Status -->
+        <Label Grid.Row="2" Grid.ColumnSpan="2"
+               x:Name="StatusLabel"
+               Text="Disconnected"
+               HorizontalOptions="Center" />
+
+        <!-- Android Options (visible only on Android) -->
+        <StackLayout Grid.Row="3" Grid.ColumnSpan="2" IsVisible="{Binding IsAndroid}">
+            <Label Text="Android Connection Options:" FontAttributes="Bold" />
+            <StackLayout Orientation="Horizontal">
+                <CheckBox x:Name="UseDirectWebSocketsCheckbox"
+                          IsChecked="{Binding UseDirectWebSockets}"
+                          VerticalOptions="Center" />
+                <Label Text="Use direct WebSockets instead of SignalR"
+                       VerticalOptions="Center" />
+            </StackLayout>
+        </StackLayout>
+
+        <!-- Last Notification -->
+        <Frame Grid.Row="4" Grid.ColumnSpan="2" Padding="10" BorderColor="LightGray">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Last Notification:" FontAttributes="Bold" />
+                <Label x:Name="LastNotificationText" Text="No notifications received yet" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Action Buttons -->
+        <HorizontalStackLayout Grid.Row="6" Grid.ColumnSpan="2" Spacing="10" HorizontalOptions="Center">
+            <Button x:Name="TestButton"
+                    Text="Test Notification"
+                    Clicked="TestButton_Clicked" />
+            <Button x:Name="HistoryButton"
+                    Text="View History"
+                    Clicked="HistoryButton_Clicked" />
+            <Button x:Name="SettingsButton"
+                    Text="Settings"
+                    Clicked="SettingsButton_Clicked" />
+            <Button x:Name="DisconnectButton"
+                    Text="Disconnect"
+                    Clicked="DisconnectButton_Clicked"
+                    IsEnabled="False" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>
