@@ -4,7 +4,7 @@
 ![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
 ![SignalR](https://img.shields.io/badge/SignalR-2C2D72?style=for-the-badge&logo=microsoft&logoColor=white)
 ![MAUI](https://img.shields.io/badge/MAUI-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
+![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg?style=for-the-badge)
 
 ## 📋 Overview
 
@@ -253,8 +253,10 @@ dotnet test
 
 ## 👮 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Credits
+## 👨‍💻 Author
 
-This project was developed by [Augment](https://augmentcode.com/) - an AI-powered coding assistant.
+This project was developed by Michal Grznár (michal@grznar.eu).
+
+Project URL: https://github.com/Michal1609/WebHookReceiver
