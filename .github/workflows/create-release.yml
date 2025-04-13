@@ -71,18 +71,13 @@ jobs:
         run: Compress-Archive -Path publish/ApiKeyGenerator/* -DestinationPath ApiKeyGenerator-${{ github.event.inputs.version }}.zip
         shell: pwsh
 
-      - name: Upload WebHookNotifier artifact
+      - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
-          path: WebHookNotifier-${{ github.event.inputs.version }}.zip
-          retention-days: 1
-
-      - name: Upload ApiKeyGenerator artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-artifacts
-          path: ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+          name: windows-artifacts
+          path: |
+            WebHookNotifier-${{ github.event.inputs.version }}.zip
+            ApiKeyGenerator-${{ github.event.inputs.version }}.zip
           retention-days: 1
 
   build-api:
@@ -119,7 +114,7 @@ jobs:
       - name: Upload API artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
+          name: api-artifact
           path: WebHookReceiverApi-${{ github.event.inputs.version }}.zip
           retention-days: 1
 
@@ -192,7 +187,7 @@ jobs:
       - name: Upload MAUI Android artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
+          name: maui-artifact
           path: WebHookNotifierMaui-${{ github.event.inputs.version }}.apk
           retention-days: 1
 
@@ -228,7 +223,10 @@ jobs:
       - name: Prepare release files
         run: |
           mkdir -p release_files
-          cp artifacts/release-artifacts/* release_files/
+          cp artifacts/windows-artifacts/* release_files/ || echo "No Windows artifacts found"
+          cp artifacts/api-artifact/* release_files/ || echo "No API artifacts found"
+          cp artifacts/maui-artifact/* release_files/ || echo "No MAUI artifacts found"
+          echo "Release files content:"
           ls -la release_files/
 
       - name: Create Release
