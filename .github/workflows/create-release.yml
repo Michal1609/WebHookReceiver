@@ -1,0 +1,217 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+      prerelease:
+        description: 'Is this a prerelease?'
+        type: boolean
+        default: false
+      draft:
+        description: 'Create as draft release?'
+        type: boolean
+        default: true
+
+jobs:
+  build-windows-apps:
+    name: Build Windows Applications
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore WebHookNotifier/WebHookNotifier.csproj
+          dotnet restore ApiKeyGenerator/ApiKeyGenerator.csproj
+
+      - name: Update version
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          
+          # Update WebHookNotifier version
+          $webhookNotifierPath = "WebHookNotifier/WebHookNotifier.csproj"
+          $webhookNotifierContent = Get-Content $webhookNotifierPath -Raw
+          $webhookNotifierContent = $webhookNotifierContent -replace '<Version>.*?</Version>', "<Version>$version</Version>"
+          $webhookNotifierContent | Set-Content $webhookNotifierPath -NoNewline
+          
+          # Update ApiKeyGenerator version
+          $apiKeyGeneratorPath = "ApiKeyGenerator/ApiKeyGenerator.csproj"
+          $apiKeyGeneratorContent = Get-Content $apiKeyGeneratorPath -Raw
+          $apiKeyGeneratorContent = $apiKeyGeneratorContent -replace '<Version>.*?</Version>', "<Version>$version</Version>"
+          $apiKeyGeneratorContent | Set-Content $apiKeyGeneratorPath -NoNewline
+        shell: pwsh
+
+      - name: Build WebHookNotifier
+        run: dotnet publish WebHookNotifier/WebHookNotifier.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/WebHookNotifier
+
+      - name: Build ApiKeyGenerator
+        run: dotnet publish ApiKeyGenerator/ApiKeyGenerator.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/ApiKeyGenerator
+
+      - name: Create WebHookNotifier ZIP
+        run: Compress-Archive -Path publish/WebHookNotifier/* -DestinationPath WebHookNotifier-${{ github.event.inputs.version }}.zip
+        shell: pwsh
+
+      - name: Create ApiKeyGenerator ZIP
+        run: Compress-Archive -Path publish/ApiKeyGenerator/* -DestinationPath ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+        shell: pwsh
+
+      - name: Upload WebHookNotifier artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebHookNotifier
+          path: WebHookNotifier-${{ github.event.inputs.version }}.zip
+          retention-days: 1
+
+      - name: Upload ApiKeyGenerator artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApiKeyGenerator
+          path: ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+          retention-days: 1
+
+  build-api:
+    name: Build API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore WebHookReceiverApi/WebHookReceiverApi.csproj
+
+      - name: Update version
+        run: |
+          version="${{ github.event.inputs.version }}"
+          
+          # Update WebHookReceiverApi version
+          file="WebHookReceiverApi/WebHookReceiverApi.csproj"
+          sed -i "s/<Version>.*<\/Version>/<Version>$version<\/Version>/g" "$file"
+
+      - name: Build API
+        run: dotnet publish WebHookReceiverApi/WebHookReceiverApi.csproj -c Release -o publish/WebHookReceiverApi
+
+      - name: Create API ZIP
+        run: cd publish && zip -r ../WebHookReceiverApi-${{ github.event.inputs.version }}.zip WebHookReceiverApi
+
+      - name: Upload API artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebHookReceiverApi
+          path: WebHookReceiverApi-${{ github.event.inputs.version }}.zip
+          retention-days: 1
+
+  build-maui-android:
+    name: Build MAUI Android
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui-android
+
+      - name: Restore dependencies
+        run: dotnet restore WebHookNotifierMaui/WebHookNotifierMaui.csproj
+
+      - name: Update version
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          
+          # Update WebHookNotifierMaui version
+          $mauiPath = "WebHookNotifierMaui/WebHookNotifierMaui.csproj"
+          $mauiContent = Get-Content $mauiPath -Raw
+          $mauiContent = $mauiContent -replace '<Version>.*?</Version>', "<Version>$version</Version>"
+          $mauiContent = $mauiContent -replace '<ApplicationVersion>.*?</ApplicationVersion>', "<ApplicationVersion>$version</ApplicationVersion>"
+          $mauiContent = $mauiContent -replace '<ApplicationDisplayVersion>.*?</ApplicationDisplayVersion>', "<ApplicationDisplayVersion>$version</ApplicationDisplayVersion>"
+          $mauiContent | Set-Content $mauiPath -NoNewline
+          
+          # Update Android Manifest version
+          $manifestPath = "WebHookNotifierMaui/Platforms/Android/AndroidManifest.xml"
+          $manifestContent = Get-Content $manifestPath -Raw
+          
+          # Extract version components
+          $versionParts = $version.Split('.')
+          $versionCode = [int]$versionParts[0] * 10000 + [int]$versionParts[1] * 100
+          if ($versionParts.Length -gt 2) {
+            $versionCode += [int]$versionParts[2]
+          }
+          
+          $manifestContent = $manifestContent -replace 'android:versionCode="[^"]*"', "android:versionCode=""$versionCode"""
+          $manifestContent = $manifestContent -replace 'android:versionName="[^"]*"', "android:versionName=""$version"""
+          $manifestContent | Set-Content $manifestPath -NoNewline
+        shell: pwsh
+
+      - name: Build MAUI Android
+        run: dotnet publish WebHookNotifierMaui/WebHookNotifierMaui.csproj -f net9.0-android -c Release -o publish/WebHookNotifierMaui
+
+      - name: Locate APK file
+        id: locate-apk
+        run: |
+          $apkPath = Get-ChildItem -Path publish/WebHookNotifierMaui -Filter *.apk -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          echo "APK_PATH=$apkPath" >> $env:GITHUB_ENV
+          echo "Found APK at: $apkPath"
+        shell: pwsh
+
+      - name: Rename APK file
+        run: |
+          $destination = "WebHookNotifierMaui-${{ github.event.inputs.version }}.apk"
+          Copy-Item -Path $env:APK_PATH -Destination $destination
+          echo "Final APK: $destination"
+        shell: pwsh
+
+      - name: Upload MAUI Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebHookNotifierMaui-Android
+          path: WebHookNotifierMaui-${{ github.event.inputs.version }}.apk
+          retention-days: 1
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-windows-apps, build-api, build-maui-android]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          draft: ${{ github.event.inputs.draft }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+          files: |
+            artifacts/WebHookNotifier/WebHookNotifier-${{ github.event.inputs.version }}.zip
+            artifacts/ApiKeyGenerator/ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+            artifacts/WebHookReceiverApi/WebHookReceiverApi-${{ github.event.inputs.version }}.zip
+            artifacts/WebHookNotifierMaui-Android/WebHookNotifierMaui-${{ github.event.inputs.version }}.apk
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
