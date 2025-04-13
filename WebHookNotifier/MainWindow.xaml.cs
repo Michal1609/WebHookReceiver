@@ -28,6 +28,10 @@ public partial class MainWindow : Window
 
         // Initialize database services
         InitializeDatabaseServices();
+
+        // Load connection settings
+        ServerUrlTextBox.Text = NotificationSettings.Instance.ApiUrl;
+        SignalRKeyTextBox.Text = NotificationSettings.Instance.SignalRKey;
     }
 
     private void InitializeDatabaseServices()
@@ -55,6 +59,18 @@ public partial class MainWindow : Window
             MessageBox.Show("Enter server URL", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
+
+        string signalRKey = SignalRKeyTextBox.Text.Trim();
+        if (string.IsNullOrEmpty(signalRKey))
+        {
+            MessageBox.Show("Please enter a valid SignalR key", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        // Save settings for next time
+        NotificationSettings.Instance.ApiUrl = hubUrl;
+        NotificationSettings.Instance.SignalRKey = signalRKey;
+        NotificationSettings.Instance.Save();
 
         try
         {

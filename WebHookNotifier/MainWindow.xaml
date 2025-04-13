@@ -31,6 +31,12 @@
             <TextBlock Text="Server URL:" FontWeight="Bold" Margin="0,0,0,5"/>
             <TextBox x:Name="ServerUrlTextBox" Text="http://localhost:5017/notificationHub" Margin="0,0,0,10"/>
 
+            <TextBlock Text="SignalR Key:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox x:Name="SignalRKeyTextBox" Margin="0,0,0,10"/>
+            <TextBlock TextWrapping="Wrap" FontStyle="Italic" Foreground="Gray" Margin="0,0,0,10">
+                The SignalR key is required to connect to the API. It must match the key configured on the server.
+            </TextBlock>
+
             <CheckBox x:Name="AutoStartCheckBox" Content="Start with Windows" Margin="0,0,0,10"/>
 
             <TextBlock Text="Last notification:" FontWeight="Bold" Margin="0,0,0,5"/>

@@ -43,6 +43,8 @@
                 </StackPanel>
             </GroupBox>
 
+            <!-- API Connection settings moved to main window -->
+
             <GroupBox Header="Security" Padding="10" Margin="0,10,0,0">
                 <StackPanel>
                     <CheckBox x:Name="EnableEncryptionCheckBox" Content="Enable encryption for data transmission" IsChecked="True"/>
