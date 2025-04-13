@@ -113,9 +113,22 @@ public partial class MainWindow : Window
         try
         {
             // Pokud je okno zavřené nebo v nestabilním stavu, vytvoříme nové
-            if (!IsLoaded || !IsVisible)
+            if (!IsLoaded)
             {
-                // Pokusíme se nejprve zobrazit stávající okno
+                // Okno bylo zavřeno, musíme vytvořit nové
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    // Vytvoříme nové hlavní okno
+                    MainWindow newWindow = new MainWindow();
+                    Application.Current.MainWindow = newWindow;
+                    newWindow.Show();
+                    newWindow.WindowState = WindowState.Normal;
+                    newWindow.Activate();
+                });
+            }
+            else if (!IsVisible)
+            {
+                // Okno je vytvořeno, ale není viditelné
                 Show();
                 WindowState = WindowState.Normal;
                 Activate();
@@ -131,17 +144,21 @@ public partial class MainWindow : Window
             // Zachytíme všechny výjimky, aby aplikace nespadla
             MessageBox.Show($"Error showing main window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-            // Pokusíme se obnovit stav aplikace
+            // Pokusíme se obnovit stav aplikace vytvořením nového okna
             try
             {
-                // Pokud došlo k chybě, zkusíme to znovu s jiným přístupem
-                WindowState = WindowState.Normal;
-                Show();
-                Activate();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    // Vytvoříme nové hlavní okno
+                    MainWindow newWindow = new MainWindow();
+                    Application.Current.MainWindow = newWindow;
+                    newWindow.Show();
+                });
             }
-            catch
+            catch (Exception innerEx)
             {
-                // Ignorujeme další výjimky, aby aplikace nespadla
+                // Zachytíme všechny výjimky, aby aplikace nespadla
+                MessageBox.Show($"Critical error: {innerEx.Message}", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -210,12 +227,39 @@ public partial class MainWindow : Window
         ShowHistoryWindow();
     }
 
+    // Proměnná pro sledování, zda je okno nastavení již otevřeno
+    private SettingsWindow? _settingsWindow = null;
+
     private void ShowSettingsWindow()
     {
-        var settingsWindow = new SettingsWindow();
-        settingsWindow.Owner = this;
-        settingsWindow.ShowDialog();
+        // Pokud je okno nastavení již otevřeno, pouze ho aktivujeme
+        if (_settingsWindow != null && _settingsWindow.IsLoaded)
+        {
+            try
+            {
+                _settingsWindow.Activate();
+                return;
+            }
+            catch
+            {
+                // Pokud došlo k chybě, vytvoříme nové okno
+                _settingsWindow = null;
+            }
+        }
+
+        // Vytvoříme nové okno nastavení
+        _settingsWindow = new SettingsWindow();
+        _settingsWindow.Owner = this;
+
+        // Přidáme handler pro událost zavření okna
+        _settingsWindow.Closed += (s, args) => _settingsWindow = null;
+
+        // Zobrazíme okno jako dialog
+        _settingsWindow.ShowDialog();
     }
+
+    // Proměnná pro sledování, zda je okno historie již otevřeno
+    private HistoryWindow? _historyWindow = null;
 
     private void ShowHistoryWindow()
     {
@@ -227,9 +271,30 @@ public partial class MainWindow : Window
                 return;
             }
 
-            var historyWindow = new HistoryWindow(_historyService);
-            historyWindow.Owner = this;
-            historyWindow.ShowDialog();
+            // Pokud je okno historie již otevřeno, pouze ho aktivujeme
+            if (_historyWindow != null && _historyWindow.IsLoaded)
+            {
+                try
+                {
+                    _historyWindow.Activate();
+                    return;
+                }
+                catch
+                {
+                    // Pokud došlo k chybě, vytvoříme nové okno
+                    _historyWindow = null;
+                }
+            }
+
+            // Vytvoříme nové okno historie
+            _historyWindow = new HistoryWindow(_historyService);
+            _historyWindow.Owner = this;
+
+            // Přidáme handler pro událost zavření okna
+            _historyWindow.Closed += (s, args) => _historyWindow = null;
+
+            // Zobrazíme okno jako dialog
+            _historyWindow.ShowDialog();
         }
         catch (Exception ex)
         {
@@ -239,9 +304,40 @@ public partial class MainWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        if (_notificationService != null)
+        try
         {
-            _notificationService.Stop();
+            // Zastavíme notifikační službu
+            if (_notificationService != null)
+            {
+                _notificationService.Stop();
+                _notificationService = null;
+            }
+
+            // Zavřeme všechna otevřená okna
+            if (_settingsWindow != null && _settingsWindow.IsLoaded)
+            {
+                _settingsWindow.Close();
+                _settingsWindow = null;
+            }
+
+            if (_historyWindow != null && _historyWindow.IsLoaded)
+            {
+                _historyWindow.Close();
+                _historyWindow = null;
+            }
+
+            // Skryjeme okno místo zavření, pokud uživatel klikl na křížek
+            // Kontrola, zda není aplikace v procesu ukončování
+            if (Application.Current.MainWindow != null)
+            {
+                e.Cancel = true; // Zrušíme zavření
+                Hide();         // Pouze skryjeme okno
+            }
+        }
+        catch (Exception ex)
+        {
+            // Zachytíme všechny výjimky, aby aplikace nespadla
+            MessageBox.Show($"Error during window closing: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
