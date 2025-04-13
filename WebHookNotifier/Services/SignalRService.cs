@@ -21,7 +21,7 @@ namespace WebHookNotifier.Services
             _isConnected = false;
         }
 
-        public async Task StartAsync()
+        public async Task<bool> StartAsync()
         {
             if (_hubConnection == null)
             {
@@ -98,23 +98,25 @@ namespace WebHookNotifier.Services
                 };
             }
 
-            await ConnectAsync();
+            return await ConnectAsync();
         }
 
-        private async Task ConnectAsync()
+        private async Task<bool> ConnectAsync()
         {
             if (_hubConnection == null)
-                return;
+                return false;
 
             try
             {
                 await _hubConnection.StartAsync();
                 _isConnected = true;
+                return true;
             }
             catch (Exception ex)
             {
                 _isConnected = false;
                 Console.WriteLine($"Error connecting to hub: {ex.Message}");
+                throw; // Re-throw the exception to be caught by the caller
             }
         }
 

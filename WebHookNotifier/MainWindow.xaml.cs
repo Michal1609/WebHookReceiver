@@ -51,7 +51,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ConnectButton_Click(object sender, RoutedEventArgs e)
+    private async void ConnectButton_Click(object sender, RoutedEventArgs e)
     {
         string hubUrl = ServerUrlTextBox.Text.Trim();
         if (string.IsNullOrEmpty(hubUrl))
@@ -72,31 +72,60 @@ public partial class MainWindow : Window
         NotificationSettings.Instance.SignalRKey = signalRKey;
         NotificationSettings.Instance.Save();
 
+        // Disable connect button and update status during connection attempt
+        ConnectButton.IsEnabled = false;
+        StatusText.Text = $"Connecting to {hubUrl}...";
+
         try
         {
             _notificationService = new NotificationService(hubUrl, _historyService);
-            _notificationService.Start();
+            bool connected = await _notificationService.Start();
 
-            StatusText.Text = $"Connected to {hubUrl}";
-            ConnectButton.IsEnabled = false;
-            DisconnectButton.IsEnabled = true;
+            if (connected)
+            {
+                StatusText.Text = $"Connected to {hubUrl}";
+                DisconnectButton.IsEnabled = true;
+            }
+            else
+            {
+                StatusText.Text = "Connection failed";
+                ConnectButton.IsEnabled = true;
+                DisconnectButton.IsEnabled = false;
+                MessageBox.Show("Failed to connect to the server. Please check the URL and SignalR key.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         catch (Exception ex)
         {
+            StatusText.Text = "Connection failed";
+            ConnectButton.IsEnabled = true;
+            DisconnectButton.IsEnabled = false;
             MessageBox.Show($"Connection error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    private void DisconnectButton_Click(object sender, RoutedEventArgs e)
+    private async void DisconnectButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_notificationService != null)
+        try
         {
-            _notificationService.Stop();
-            _notificationService = null;
+            // Disable disconnect button during disconnection
+            DisconnectButton.IsEnabled = false;
+            StatusText.Text = "Disconnecting...";
+
+            if (_notificationService != null)
+            {
+                await _notificationService.Stop();
+                _notificationService = null;
+            }
 
             StatusText.Text = "Disconnected";
             ConnectButton.IsEnabled = true;
-            DisconnectButton.IsEnabled = false;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error disconnecting: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            // Re-enable disconnect button if there was an error
+            DisconnectButton.IsEnabled = true;
         }
     }
 
@@ -302,14 +331,21 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         try
         {
             // Zastavíme notifikační službu
             if (_notificationService != null)
             {
-                _notificationService.Stop();
+                try
+                {
+                    await _notificationService.Stop();
+                }
+                catch
+                {
+                    // Ignorujeme chyby při zavírání aplikace
+                }
                 _notificationService = null;
             }
 

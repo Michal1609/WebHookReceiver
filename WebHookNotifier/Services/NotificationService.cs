@@ -132,14 +132,23 @@ namespace WebHookNotifier.Services
             MainWindow.ShowBalloonTip(title, message, Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
         }
 
-        public async void Start()
+        public async Task<bool> Start()
         {
-            await _signalRService.StartAsync();
+            bool result = await _signalRService.StartAsync();
+            return result;
         }
 
-        public async void Stop()
+        public async Task Stop()
         {
-            await _signalRService.StopAsync();
+            try
+            {
+                await _signalRService.StopAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error stopping SignalR service: {ex.Message}");
+                throw; // Re-throw to be handled by the caller
+            }
         }
 
         /// <summary>
