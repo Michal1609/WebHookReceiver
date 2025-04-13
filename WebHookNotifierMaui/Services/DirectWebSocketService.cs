@@ -22,8 +22,13 @@ namespace WebHookNotifierMaui.Services
 
         public DirectWebSocketService(string hubUrl)
         {
-            // Převést SignalR hub URL na WebSocket URL
-            _webSocketUrl = hubUrl.Replace("http://", "ws://").Replace("https://", "wss://");
+            // Převést SignalR hub URL na WebSocket URL a přidat SignalR klíč
+            string signalRKey = NotificationSettings.Instance.SignalRKey;
+            string separator = hubUrl.Contains("?") ? "&" : "?";
+            _webSocketUrl = hubUrl.Replace("http://", "ws://").Replace("https://", "wss://") +
+                           $"{separator}signalRKey={signalRKey}";
+
+            Console.WriteLine($"WebSocket URL with auth: {_webSocketUrl}");
             _isConnected = false;
             _cts = new CancellationTokenSource();
         }
@@ -33,18 +38,18 @@ namespace WebHookNotifierMaui.Services
             try
             {
                 Console.WriteLine($"Starting direct WebSocket connection to {_webSocketUrl}");
-                
+
                 _webSocket = new ClientWebSocket();
-                
+
                 // Nastavit timeout
                 _webSocket.Options.SetRequestHeader("Connection", "keep-alive");
-                
+
                 // Připojit se k WebSocket serveru
                 await _webSocket.ConnectAsync(new Uri(_webSocketUrl), _cts.Token);
                 _isConnected = true;
-                
+
                 Console.WriteLine("WebSocket connected successfully");
-                
+
                 // Spustit naslouchání zpráv
                 _ = Task.Run(ReceiveMessagesAsync);
             }
@@ -53,12 +58,12 @@ namespace WebHookNotifierMaui.Services
                 _isConnected = false;
                 Console.WriteLine($"Error connecting WebSocket: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                
+
                 if (ex.InnerException != null)
                 {
                     Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
                 }
-                
+
                 throw;
             }
         }
@@ -66,31 +71,31 @@ namespace WebHookNotifierMaui.Services
         private async Task ReceiveMessagesAsync()
         {
             var buffer = new byte[4096];
-            
+
             try
             {
                 while (_webSocket.State == WebSocketState.Open && !_cts.Token.IsCancellationRequested)
                 {
                     var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), _cts.Token);
-                    
+
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
                         Console.WriteLine("WebSocket connection closed by server");
                         _isConnected = false;
                         break;
                     }
-                    
+
                     // Zpracovat přijatou zprávu
                     if (result.MessageType == WebSocketMessageType.Text)
                     {
                         string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
                         Console.WriteLine($"Received WebSocket message: {message}");
-                        
+
                         try
                         {
                             // Zkusit deserializovat jako WebhookData
                             var data = JsonSerializer.Deserialize<WebhookData>(message);
-                            
+
                             if (data != null)
                             {
                                 Console.WriteLine($"Deserialized WebSocket message as WebhookData: {data.Event}");
@@ -118,18 +123,18 @@ namespace WebHookNotifierMaui.Services
                 if (_webSocket != null && _webSocket.State == WebSocketState.Open)
                 {
                     Console.WriteLine("Closing WebSocket connection");
-                    
+
                     // Zrušit token pro ukončení naslouchání
                     _cts.Cancel();
-                    
+
                     // Zavřít WebSocket spojení
                     await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closing", CancellationToken.None);
                     _webSocket.Dispose();
                     _webSocket = null;
-                    
+
                     Console.WriteLine("WebSocket connection closed successfully");
                 }
-                
+
                 _isConnected = false;
             }
             catch (Exception ex)

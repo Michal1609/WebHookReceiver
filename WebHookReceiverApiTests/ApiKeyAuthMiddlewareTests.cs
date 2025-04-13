@@ -9,16 +9,16 @@ namespace WebHookReceiverApiTests;
 
 public class ApiKeyAuthMiddlewareTests
 {
-    private readonly Mock<IOptions<ApiKeySettings>> _mockOptions;
+    private readonly Mock<IOptions<AppSettings>> _mockOptions;
     private readonly Mock<ILogger<ApiKeyAuthMiddleware>> _mockLogger;
-    private readonly ApiKeySettings _apiKeySettings;
+    private readonly AppSettings _appSettings;
     private readonly string _validApiKey = "test-api-key";
 
     public ApiKeyAuthMiddlewareTests()
     {
-        _apiKeySettings = new ApiKeySettings { ApiKey = _validApiKey };
-        _mockOptions = new Mock<IOptions<ApiKeySettings>>();
-        _mockOptions.Setup(x => x.Value).Returns(_apiKeySettings);
+        _appSettings = new AppSettings { ApiKey = _validApiKey };
+        _mockOptions = new Mock<IOptions<AppSettings>>();
+        _mockOptions.Setup(x => x.Value).Returns(_appSettings);
         _mockLogger = new Mock<ILogger<ApiKeyAuthMiddleware>>();
     }
 

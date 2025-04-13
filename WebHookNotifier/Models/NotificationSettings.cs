@@ -24,6 +24,10 @@ namespace WebHookNotifier.Models
         public bool EnableHistoryTracking { get; set; } = true;
         public int HistoryRetentionDays { get; set; } = 30;
 
+        // API settings
+        public string ApiUrl { get; set; } = "http://localhost:5017/notificationHub";
+        public string SignalRKey { get; set; } = "signalr-connection-key-2025";
+
         // Database settings
         public DatabaseType DatabaseType { get; set; } = DatabaseType.SQLite;
         private string _encryptedSqlServerConnectionString = string.Empty;

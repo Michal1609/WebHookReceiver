@@ -11,8 +11,12 @@ builder.Services.AddControllers();
 // Add SignalR
 builder.Services.AddSignalR();
 
+// Add authentication
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+
 // API key configuration
-builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -42,6 +46,10 @@ app.UseCors("CorsPolicy");
 
 // Enable static files
 app.UseStaticFiles();
+
+// Use authentication and authorization
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Use API key authentication
 app.UseApiKeyAuth();

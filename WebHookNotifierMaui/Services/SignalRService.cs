@@ -31,8 +31,24 @@ namespace WebHookNotifierMaui.Services
                 Console.WriteLine($"Creating new hub connection to {_hubUrl}");
                 Console.WriteLine($"Configuring SignalR connection for platform: {DeviceInfo.Platform}");
 
+                // Get SignalR key from settings
+                string signalRKey = NotificationSettings.Instance.SignalRKey;
+                Console.WriteLine($"Using SignalR key for authentication: {signalRKey.Substring(0, 3)}...");
+
+                // Add SignalR key as query parameter
+                string hubUrlWithAuth = _hubUrl;
+                if (_hubUrl.Contains("?"))
+                {
+                    hubUrlWithAuth += $"&signalRKey={signalRKey}";
+                }
+                else
+                {
+                    hubUrlWithAuth += $"?signalRKey={signalRKey}";
+                }
+                Console.WriteLine($"Connecting to hub with auth: {hubUrlWithAuth}");
+
                 var builder = new HubConnectionBuilder()
-                    .WithUrl(_hubUrl, options => {
+                    .WithUrl(hubUrlWithAuth, options => {
                         // Nastavit timeout na delší dobu
                         options.HttpMessageHandlerFactory = (handler) => {
                             if (handler is HttpClientHandler clientHandler)

@@ -44,6 +44,9 @@ namespace WebHookNotifierMaui.Models
             }
         }
 
+        // SignalR authentication key
+        public string SignalRKey { get; set; } = "signalr-connection-key-2025";
+
         // Database settings
         public DatabaseType DatabaseType { get; set; } = DatabaseType.SQLite;
         private string _encryptedSqlServerConnectionString = string.Empty;

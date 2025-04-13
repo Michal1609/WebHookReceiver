@@ -7,17 +7,17 @@ namespace WebHookReceiverApi.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ApiKeyAuthMiddleware> _logger;
-        private readonly ApiKeySettings _apiKeySettings;
+        private readonly AppSettings _appSettings;
         private const string API_KEY_HEADER_NAME = "X-API-Key";
 
         public ApiKeyAuthMiddleware(
             RequestDelegate next,
             ILogger<ApiKeyAuthMiddleware> logger,
-            IOptions<ApiKeySettings> apiKeySettings)
+            IOptions<AppSettings> appSettings)
         {
             _next = next;
             _logger = logger;
-            _apiKeySettings = apiKeySettings.Value;
+            _appSettings = appSettings.Value;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -41,7 +41,7 @@ namespace WebHookReceiverApi.Middleware
             }
 
             // Verify API key
-            if (!_apiKeySettings.ApiKey.Equals(extractedApiKey))
+            if (!_appSettings.ApiKey.Equals(extractedApiKey))
             {
                 _logger.LogWarning("Invalid API key");
                 context.Response.StatusCode = 401; // Unauthorized

@@ -25,8 +25,23 @@ namespace WebHookNotifier.Services
         {
             if (_hubConnection == null)
             {
+                // Get SignalR key from settings
+                string signalRKey = NotificationSettings.Instance.SignalRKey;
+
+                // Build connection with authentication
+                // Add SignalR key as query parameter
+                string hubUrlWithAuth = _hubUrl;
+                if (_hubUrl.Contains("?"))
+                {
+                    hubUrlWithAuth += $"&signalRKey={signalRKey}";
+                }
+                else
+                {
+                    hubUrlWithAuth += $"?signalRKey={signalRKey}";
+                }
+
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(_hubUrl)
+                    .WithUrl(hubUrlWithAuth)
                     .WithAutomaticReconnect()
                     .Build();
 

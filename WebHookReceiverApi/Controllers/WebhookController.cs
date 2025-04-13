@@ -14,13 +14,13 @@ namespace WebHookReceiverApi.Controllers
     {
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly ILogger<WebhookController> _logger;
-        private readonly ApiKeySettings _apiKeySettings;
+        private readonly AppSettings _appSettings;
 
-        public WebhookController(IHubContext<NotificationHub> hubContext, ILogger<WebhookController> logger, IOptions<ApiKeySettings> apiKeySettings)
+        public WebhookController(IHubContext<NotificationHub> hubContext, ILogger<WebhookController> logger, IOptions<AppSettings> appSettings)
         {
             _hubContext = hubContext;
             _logger = logger;
-            _apiKeySettings = apiKeySettings.Value;
+            _appSettings = appSettings.Value;
         }
 
         [HttpPost]
@@ -47,7 +47,7 @@ namespace WebHookReceiverApi.Controllers
                 string dataToSend;
 
                 // Check if encryption is enabled in settings
-                if (_apiKeySettings.EnableEncryption)
+                if (_appSettings.EnableEncryption)
                 {
                     // Encrypt webhook data before sending
                     string jsonData = JsonSerializer.Serialize(webhookData);

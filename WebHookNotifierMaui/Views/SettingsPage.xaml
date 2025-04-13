@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WebHookNotifierMaui.Views.SettingsPage"
              Title="Settings">
-    
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
-            
+
             <!-- Header -->
             <Label Text="Notification Settings"
                    FontSize="24"
@@ -17,32 +17,50 @@
             <Frame BorderColor="LightGray" Padding="15">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Rate Limiting" FontAttributes="Bold" FontSize="18" />
-                    
+
                     <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto">
-                        <Label Grid.Row="0" Grid.Column="0" 
-                               Text="Minimum seconds between notifications:" 
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="Minimum seconds between notifications:"
                                VerticalOptions="Center" />
-                        <Entry Grid.Row="0" Grid.Column="1" 
+                        <Entry Grid.Row="0" Grid.Column="1"
                                x:Name="MinSecondsBetweenNotificationsEntry"
                                Keyboard="Numeric"
                                WidthRequest="80"
                                HorizontalTextAlignment="Center" />
-                        
-                        <Label Grid.Row="1" Grid.Column="0" 
-                               Text="Maximum queued notifications:" 
+
+                        <Label Grid.Row="1" Grid.Column="0"
+                               Text="Maximum queued notifications:"
                                VerticalOptions="Center" />
-                        <Entry Grid.Row="1" Grid.Column="1" 
+                        <Entry Grid.Row="1" Grid.Column="1"
                                x:Name="MaxQueuedNotificationsEntry"
                                Keyboard="Numeric"
                                WidthRequest="80"
                                HorizontalTextAlignment="Center" />
                     </Grid>
-                    
+
                     <HorizontalStackLayout>
                         <CheckBox x:Name="EnableNotificationSoundsCheckBox" />
-                        <Label Text="Enable notification sounds" 
+                        <Label Text="Enable notification sounds"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- API Connection Settings -->
+            <Frame BorderColor="LightGray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="API Connection" FontAttributes="Bold" FontSize="18" />
+
+                    <Label Text="API URL:" />
+                    <Entry x:Name="ApiUrlEntry"
+                           Placeholder="Enter API URL" />
+
+                    <Label Text="SignalR Key:" />
+                    <Entry x:Name="SignalRKeyEntry"
+                           Placeholder="Enter SignalR authentication key" />
+
+                    <Label Text="This key must match the key configured on the server"
+                           FontSize="12" TextColor="Gray" />
                 </VerticalStackLayout>
             </Frame>
 
@@ -50,10 +68,10 @@
             <Frame BorderColor="LightGray" Padding="15">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Security" FontAttributes="Bold" FontSize="18" />
-                    
+
                     <HorizontalStackLayout>
                         <CheckBox x:Name="EnableEncryptionCheckBox" />
-                        <Label Text="Enable encryption for sensitive data" 
+                        <Label Text="Enable encryption for sensitive data"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
@@ -63,18 +81,18 @@
             <Frame BorderColor="LightGray" Padding="15">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="History" FontAttributes="Bold" FontSize="18" />
-                    
+
                     <HorizontalStackLayout>
                         <CheckBox x:Name="EnableHistoryTrackingCheckBox" />
-                        <Label Text="Enable notification history tracking" 
+                        <Label Text="Enable notification history tracking"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
-                    
+
                     <Grid ColumnDefinitions="*, Auto">
-                        <Label Grid.Column="0" 
-                               Text="Keep history for days:" 
+                        <Label Grid.Column="0"
+                               Text="Keep history for days:"
                                VerticalOptions="Center" />
-                        <Entry Grid.Column="1" 
+                        <Entry Grid.Column="1"
                                x:Name="HistoryRetentionDaysEntry"
                                Keyboard="Numeric"
                                WidthRequest="80"
@@ -87,19 +105,19 @@
             <Frame BorderColor="LightGray" Padding="15">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Database" FontAttributes="Bold" FontSize="18" />
-                    
+
                     <Picker x:Name="DatabaseTypePicker" Title="Select database type">
                         <Picker.Items>
                             <x:String>SQLite (Local)</x:String>
                             <x:String>SQL Server</x:String>
                         </Picker.Items>
                     </Picker>
-                    
+
                     <VerticalStackLayout x:Name="SqlServerSettingsLayout" IsVisible="false" Spacing="10">
                         <Label Text="SQL Server Connection String:" />
-                        <Entry x:Name="SqlServerConnectionStringEntry" 
+                        <Entry x:Name="SqlServerConnectionStringEntry"
                                Placeholder="Enter SQL Server connection string" />
-                        <Button x:Name="TestConnectionButton" 
+                        <Button x:Name="TestConnectionButton"
                                 Text="Test Connection"
                                 Clicked="TestConnectionButton_Clicked" />
                     </VerticalStackLayout>
@@ -108,14 +126,14 @@
 
             <!-- Buttons -->
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
-                <Button x:Name="SaveButton" 
+                <Button x:Name="SaveButton"
                         Text="Save Settings"
                         Clicked="SaveButton_Clicked" />
-                <Button x:Name="CancelButton" 
+                <Button x:Name="CancelButton"
                         Text="Cancel"
                         Clicked="CancelButton_Clicked" />
             </HorizontalStackLayout>
-            
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
