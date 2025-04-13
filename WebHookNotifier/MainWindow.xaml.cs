@@ -105,17 +105,67 @@ public partial class MainWindow : Window
         Hide();
     }
 
+    /// <summary>
+    /// Bezpečná metoda pro zobrazení hlavního okna
+    /// </summary>
+    private void SafeShowMainWindow()
+    {
+        try
+        {
+            // Pokud je okno zavřené nebo v nestabilním stavu, vytvoříme nové
+            if (!IsLoaded || !IsVisible)
+            {
+                // Pokusíme se nejprve zobrazit stávající okno
+                Show();
+                WindowState = WindowState.Normal;
+                Activate();
+            }
+            else
+            {
+                // Okno je již zobrazené, pouze ho aktivujeme
+                Activate();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Zachytíme všechny výjimky, aby aplikace nespadla
+            MessageBox.Show($"Error showing main window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            // Pokusíme se obnovit stav aplikace
+            try
+            {
+                // Pokud došlo k chybě, zkusíme to znovu s jiným přístupem
+                WindowState = WindowState.Normal;
+                Show();
+                Activate();
+            }
+            catch
+            {
+                // Ignorujeme další výjimky, aby aplikace nespadla
+            }
+        }
+    }
+
     private void NotifyIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
     {
-        Show();
-        WindowState = WindowState.Normal;
-        Activate();
+        SafeShowMainWindow();
     }
 
     private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
     {
-        // Show settings window on double-click
-        ShowSettingsWindow();
+        try
+        {
+            // Nejprve se ujistíme, že hlavní okno je zobrazené
+            SafeShowMainWindow();
+
+            // Potom zobrazíme okno nastavení
+            ShowSettingsWindow();
+        }
+        catch (Exception ex)
+        {
+            // Zachytíme všechny výjimky, aby aplikace nespadla
+            MessageBox.Show($"Error showing settings window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void NotifyIcon_TrayRightMouseDown(object sender, RoutedEventArgs e)
@@ -125,16 +175,14 @@ public partial class MainWindow : Window
 
     private void NotifyIcon_BalloonTipClicked(object sender, RoutedEventArgs e)
     {
-        Show();
-        WindowState = WindowState.Normal;
-        Activate();
+        // Použijeme bezpečnou metodu pro zobrazení hlavního okna
+        SafeShowMainWindow();
     }
 
     private void OpenMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        Show();
-        WindowState = WindowState.Normal;
-        Activate();
+        // Použijeme bezpečnou metodu pro zobrazení hlavního okna
+        SafeShowMainWindow();
     }
 
     private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
