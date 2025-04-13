@@ -8,7 +8,7 @@
     Shell.FlyoutBehavior="Flyout"
     Title="WebHook Notifier">
 
-    <FlyoutItem Title="Main" Icon="Images/bell.png">
+    <FlyoutItem Title="Main" Icon="bell.png">
         <ShellContent
             Title="Home"
             ContentTemplate="{DataTemplate views:MainPage}"

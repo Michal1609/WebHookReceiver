@@ -171,26 +171,37 @@ namespace WebHookNotifierMaui.Views
                 _notificationService.NotificationReady += OnNotificationReady;
                 Console.WriteLine("Created notification service and registered event handler");
 
-                await _notificationService.StartAsync();
-                Console.WriteLine("Notification service started");
-
-                // Check if connection was successful
-                if (_notificationService.IsConnected)
+                try
                 {
-                    StatusLabel.Text = $"Connected to {hubUrl}";
-                    DisconnectButton.IsEnabled = true;
+                    await _notificationService.StartAsync();
+                    Console.WriteLine("Notification service started");
 
-                    // Show a test notification to confirm everything is working
-                    await DisplayAlert("Connection Successful",
-                        "Connected to the notification hub. You should now receive notifications when events occur.",
-                        "OK");
+                    // Check if connection was successful
+                    if (_notificationService.IsConnected)
+                    {
+                        StatusLabel.Text = $"Connected to {hubUrl}";
+                        DisconnectButton.IsEnabled = true;
+
+                        // Show a test notification to confirm everything is working
+                        await DisplayAlert("Connection Successful",
+                            "Connected to the notification hub. You should now receive notifications when events occur.",
+                            "OK");
+                    }
+                    else
+                    {
+                        StatusLabel.Text = "Failed to connect - Invalid SignalR key";
+                        ConnectButton.IsEnabled = true;
+                        await DisplayAlert("Authentication Error",
+                            "Connection failed. The SignalR key is invalid or the server rejected the connection.",
+                            "OK");
+                    }
                 }
-                else
+                catch (Exception connectionEx)
                 {
-                    StatusLabel.Text = "Failed to connect";
+                    StatusLabel.Text = "Connection failed";
                     ConnectButton.IsEnabled = true;
-                    await DisplayAlert("Connection Warning",
-                        "Connection attempt completed but the connection state is disconnected. Check the server URL and try again.",
+                    await DisplayAlert("Connection Error",
+                        $"Failed to connect: {connectionEx.Message}",
                         "OK");
                 }
             }

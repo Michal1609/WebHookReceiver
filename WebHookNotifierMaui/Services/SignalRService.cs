@@ -199,8 +199,23 @@ namespace WebHookNotifierMaui.Services
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // 30 sekund timeout
                 await _hubConnection.StartAsync(cts.Token);
 
-                _isConnected = true;
-                Console.WriteLine($"Successfully connected to SignalR hub. State: {_hubConnection.State}");
+                // Počkáme chvíli a zkontrolujeme, zda jsme stále připojení
+                // Toto je potřeba, protože server může odmítnout připojení kvůli neplatnému klíči
+                await Task.Delay(1000); // Počkáme 1 sekundu
+
+                // Zkontrolujeme stav připojení
+                var state = _hubConnection.State;
+                _isConnected = (state == HubConnectionState.Connected);
+
+                if (_isConnected)
+                {
+                    Console.WriteLine($"Successfully connected to SignalR hub. State: {_hubConnection.State}");
+                }
+                else
+                {
+                    Console.WriteLine($"Connection failed or was rejected. State: {_hubConnection.State}");
+                    throw new InvalidOperationException($"Connection failed or was rejected. State: {_hubConnection.State}");
+                }
 
                 // Otestovat připojení
                 if (_hubConnection.State == HubConnectionState.Connected)
