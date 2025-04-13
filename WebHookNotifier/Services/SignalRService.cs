@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using WebHookNotifier.Models;
 using WebHookNotifier.Security;
@@ -108,8 +109,26 @@ namespace WebHookNotifier.Services
 
             try
             {
-                await _hubConnection.StartAsync();
-                _isConnected = true;
+                // Nastavíme timeout pro připojení
+                var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+                // Pokusíme se připojit
+                await _hubConnection.StartAsync(cancellationTokenSource.Token);
+
+                // Počkáme chvíli a zkontrolujeme, zda jsme stále připojení
+                // Toto je potřeba, protože server může odmítnout připojení kvůli neplatnému klíči
+                await Task.Delay(500); // Počkáme 500ms
+
+                // Zkontrolujeme stav připojení
+                var state = _hubConnection.State;
+                _isConnected = (state == HubConnectionState.Connected);
+
+                if (!_isConnected)
+                {
+                    Console.WriteLine($"Connection failed. State: {state}");
+                    return false;
+                }
+
                 return true;
             }
             catch (Exception ex)

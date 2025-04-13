@@ -88,10 +88,10 @@ public partial class MainWindow : Window
             }
             else
             {
-                StatusText.Text = "Connection failed";
+                StatusText.Text = "Connection failed - Invalid SignalR key";
                 ConnectButton.IsEnabled = true;
                 DisconnectButton.IsEnabled = false;
-                MessageBox.Show("Failed to connect to the server. Please check the URL and SignalR key.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to connect to the server. The SignalR key is invalid or the server rejected the connection.", "Authentication Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         catch (Exception ex)
