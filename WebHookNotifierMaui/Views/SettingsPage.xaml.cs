@@ -29,9 +29,7 @@ namespace WebHookNotifierMaui.Views
             MaxQueuedNotificationsEntry.Text = _settings.MaxQueuedNotifications.ToString();
             EnableNotificationSoundsCheckBox.IsChecked = _settings.EnableNotificationSounds;
 
-            // API settings
-            ApiUrlEntry.Text = _settings.ApiUrl;
-            SignalRKeyEntry.Text = _settings.SignalRKey;
+            // API settings moved to main page
 
             // Security settings
             EnableEncryptionCheckBox.IsChecked = _settings.EnableEncryption;
@@ -113,22 +111,7 @@ namespace WebHookNotifierMaui.Views
                 _settings.EnableNotificationSounds = EnableNotificationSoundsCheckBox.IsChecked;
                 _settings.EnableEncryption = EnableEncryptionCheckBox.IsChecked;
 
-                // API settings
-                string apiUrl = ApiUrlEntry.Text?.Trim() ?? string.Empty;
-                if (string.IsNullOrEmpty(apiUrl))
-                {
-                    await DisplayAlert("Invalid Input", "Please enter a valid API URL.", "OK");
-                    return;
-                }
-                _settings.ApiUrl = apiUrl;
-
-                string signalRKey = SignalRKeyEntry.Text?.Trim() ?? string.Empty;
-                if (string.IsNullOrEmpty(signalRKey))
-                {
-                    await DisplayAlert("Invalid Input", "Please enter a valid SignalR key.", "OK");
-                    return;
-                }
-                _settings.SignalRKey = signalRKey;
+                // API settings moved to main page
 
                 // History settings
                 _settings.EnableHistoryTracking = EnableHistoryTrackingCheckBox.IsChecked;

@@ -14,6 +14,7 @@ namespace WebHookNotifierMaui.Views
         private DatabaseService? _databaseService;
         private NotificationHistoryService? _historyService;
         private string _apiUrl;
+        private string _signalRKey;
         private bool _useDirectWebSockets;
 
         public string ApiUrl
@@ -22,6 +23,16 @@ namespace WebHookNotifierMaui.Views
             set
             {
                 _apiUrl = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string SignalRKey
+        {
+            get => _signalRKey;
+            set
+            {
+                _signalRKey = value;
                 OnPropertyChanged();
             }
         }
@@ -46,6 +57,7 @@ namespace WebHookNotifierMaui.Views
 
             // Inicializovat vlastnosti z nastavení
             _apiUrl = NotificationSettings.Instance.ApiUrl;
+            _signalRKey = NotificationSettings.Instance.SignalRKey;
             _useDirectWebSockets = NotificationSettings.Instance.UseDirectWebSocketsOnAndroid;
 
             // Nastavit binding context
@@ -120,6 +132,13 @@ namespace WebHookNotifierMaui.Views
                 return;
             }
 
+            string signalRKey = SignalRKeyEntry.Text.Trim();
+            if (string.IsNullOrEmpty(signalRKey))
+            {
+                await DisplayAlert("Error", "Please enter a valid SignalR key", "OK");
+                return;
+            }
+
             try
             {
                 // Upravit URL pro Android, pokud je to potřeba
@@ -141,10 +160,11 @@ namespace WebHookNotifierMaui.Views
 
                 Console.WriteLine($"Connecting to hub at {hubUrl}");
 
-                // Save the URL to settings
+                // Save the URL and key to settings
                 NotificationSettings.Instance.ApiUrl = hubUrl;
+                NotificationSettings.Instance.SignalRKey = signalRKey;
                 NotificationSettings.Instance.Save();
-                Console.WriteLine("Saved URL to settings");
+                Console.WriteLine("Saved URL and SignalR key to settings");
 
                 // Create and start notification service
                 _notificationService = new NotificationService(hubUrl, _historyService);

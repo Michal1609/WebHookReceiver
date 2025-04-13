@@ -27,15 +27,26 @@
                HorizontalOptions="Center" />
 
         <!-- Server URL Input -->
-        <Entry Grid.Row="1" Grid.Column="0"
-               x:Name="ServerUrlEntry"
-               Placeholder="Enter server URL (e.g. http://localhost:5017/notificationHub)"
-               Text="{Binding ApiUrl}" />
+        <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="5">
+            <Label Text="Server URL:" FontAttributes="Bold" />
+            <Entry x:Name="ServerUrlEntry"
+                   Placeholder="Enter server URL (e.g. http://localhost:5017/notificationHub)"
+                   Text="{Binding ApiUrl}" />
+
+            <Label Text="SignalR Key:" FontAttributes="Bold" Margin="0,5,0,0" />
+            <Entry x:Name="SignalRKeyEntry"
+                   Placeholder="Enter SignalR authentication key"
+                   Text="{Binding SignalRKey}" />
+
+            <Label Text="This key must match the key configured on the server"
+                   FontSize="12" TextColor="Gray" />
+        </VerticalStackLayout>
 
         <!-- Connect Button -->
         <Button Grid.Row="1" Grid.Column="1"
                 x:Name="ConnectButton"
                 Text="Connect"
+                VerticalOptions="Start"
                 Clicked="ConnectButton_Clicked" />
 
         <!-- Status -->

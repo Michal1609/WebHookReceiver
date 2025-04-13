@@ -46,23 +46,7 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- API Connection Settings -->
-            <Frame BorderColor="LightGray" Padding="15">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="API Connection" FontAttributes="Bold" FontSize="18" />
-
-                    <Label Text="API URL:" />
-                    <Entry x:Name="ApiUrlEntry"
-                           Placeholder="Enter API URL" />
-
-                    <Label Text="SignalR Key:" />
-                    <Entry x:Name="SignalRKeyEntry"
-                           Placeholder="Enter SignalR authentication key" />
-
-                    <Label Text="This key must match the key configured on the server"
-                           FontSize="12" TextColor="Gray" />
-                </VerticalStackLayout>
-            </Frame>
+            <!-- API Connection Settings moved to main page -->
 
             <!-- Security Settings -->
             <Frame BorderColor="LightGray" Padding="15">
