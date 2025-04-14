@@ -1,77 +1,77 @@
-# 📘 WebHook Receiver - Podrobný návod k použití
+# 📘 WebHook Receiver - Comprehensive Usage Guide
 
-Tento dokument obsahuje podrobný návod k použití všech aplikací v rámci projektu WebHook Receiver, včetně příkladů, nastavení a vysvětlení funkcí.
+This document provides a detailed guide for using all applications within the WebHook Receiver project, including examples, settings, and explanations of features.
 
-## 📋 Obsah
+## 📋 Contents
 
-- [Přehled komponent](#přehled-komponent)
+- [Component Overview](#component-overview)
 - [WebHookReceiverApi](#webhookreceiverapi)
-  - [Instalace a spuštění](#instalace-a-spuštění-api)
-  - [Zabezpečení API](#zabezpečení-api)
-  - [Příklad volání API pomocí cURL](#příklad-volání-api-pomocí-curl)
-  - [Struktura dat](#struktura-dat)
-  - [SignalR klíč](#signalr-klíč)
+  - [Installation and Launch](#installation-and-launch-api)
+  - [API Security](#api-security)
+  - [Example API Call using cURL](#example-api-call-using-curl)
+  - [Data Structure](#data-structure)
+  - [SignalR Key](#signalr-key)
 - [WebHookNotifier (Windows)](#webhooknotifier-windows)
-  - [Instalace a spuštění](#instalace-a-spuštění-windows-aplikace)
-  - [Připojení k API](#připojení-k-api)
-  - [Nastavení](#nastavení-windows-aplikace)
-  - [Historie notifikací](#historie-notifikací-windows)
+  - [Installation and Launch](#installation-and-launch-windows-application)
+  - [Connecting to the API](#connecting-to-the-api)
+  - [Settings](#windows-application-settings)
+  - [Notification History](#notification-history-windows)
 - [WebHookNotifierMaui (Android)](#webhooknotifiermaui-android)
-  - [Instalace a spuštění](#instalace-a-spuštění-android-aplikace)
-  - [Připojení k API](#připojení-k-api-android)
-  - [Nastavení](#nastavení-android-aplikace)
-  - [Historie notifikací](#historie-notifikací-android)
+  - [Installation and Launch](#installation-and-launch-android-application)
+  - [Connecting to the API](#connecting-to-the-api-android)
+  - [Settings](#android-application-settings)
+  - [Notification History](#notification-history-android)
 - [ApiKeyGenerator](#apikeygenerator)
-  - [Instalace a spuštění](#instalace-a-spuštění-apikeygenerator)
-  - [Použití](#použití-apikeygenerator)
-- [Často kladené otázky](#často-kladené-otázky)
+  - [Installation and Launch](#installation-and-launch-apikeygenerator)
+  - [Usage](#apikeygenerator-usage)
+- [Frequently Asked Questions](#frequently-asked-questions)
 
-## Přehled komponent
+## Component Overview
 
-WebHook Receiver se skládá z následujících komponent:
+WebHook Receiver consists of the following components:
 
-1. **WebHookReceiverApi** - ASP.NET Core Web API aplikace, která přijímá webhooky a přeposílá je klientům pomocí SignalR
-2. **WebHookNotifier** - Windows desktopová aplikace (WPF), která zobrazuje notifikace na základě přijatých webhooků
-3. **WebHookNotifierMaui** - Multiplatformní aplikace (.NET MAUI) pro Windows, Android, iOS a macOS
-4. **ApiKeyGenerator** - Nástroj pro generování API klíčů pro zabezpečení API
+1. **WebHookReceiverApi** - ASP.NET Core Web API application that receives webhooks and forwards them to clients using SignalR
+2. **WebHookNotifier** - Windows desktop application (WPF) that displays notifications based on received webhooks
+3. **WebHookNotifierMaui** - Cross-platform application (.NET MAUI) for Windows, Android, iOS, and macOS
+4. **ApiKeyGenerator** - Tool for generating API keys for API security
 
 ## WebHookReceiverApi
 
-WebHookReceiverApi je centrální komponenta, která přijímá webhooky od externích služeb a přeposílá je připojeným klientům v reálném čase pomocí SignalR.
+WebHookReceiverApi is the central component that receives webhooks from external services and forwards them to connected clients in real-time using SignalR.
 
-### Instalace a spuštění API
+### Installation and Launch (API)
 
-1. Stáhněte si nejnovější verzi z [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
-2. Rozbalte soubor `WebHookReceiverApi-[verze].zip`
-3. Spusťte aplikaci pomocí příkazu:
+1. Download the latest version from [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
+2. Extract the `WebHookReceiverApi-[version].zip` file
+3. Launch the application using the command:
 
 ```bash
 dotnet WebHookReceiverApi.dll
 ```
 
-Nebo na Windows můžete spustit `WebHookReceiverApi.exe`.
+Or on Windows, you can run `WebHookReceiverApi.exe`.
 
-API bude dostupné na adrese `http://localhost:5017`.
+The API will be available at `http://localhost:5017`.
 
-### Zabezpečení API
+### API Security
 
-API je zabezpečeno pomocí API klíče. Každý požadavek na API musí obsahovat hlavičku `X-API-Key` s platným API klíčem.
+The API is secured using an API key. Each request to the API must include an `X-API-Key` header with a valid API key.
 
-API klíč je uložen v souboru `appsettings.json` v sekci `AppSettings.ApiKey`. Pro generování nového API klíče použijte nástroj ApiKeyGenerator.
+The API key is stored in the `appsettings.json` file in the `AppSettings.ApiKey` section. To generate a new API key, use the ApiKeyGenerator tool.
 
-Kromě API klíče pro přístup k API je také potřeba SignalR klíč pro připojení klientů k SignalR hubu. Tento klíč je uložen v souboru `appsettings.json` v sekci `AppSettings.SignalRKey`.
+In addition to the API key for accessing the API, a SignalR key is required for clients to connect to the SignalR hub. This key is stored in the `appsettings.json` file in the `AppSettings.SignalRKey` section.
 
-### Příklad volání API pomocí cURL
+### Example API Call using cURL
 
-Zde je příklad, jak poslat webhook na API pomocí cURL:
+Here's an example of how to send a webhook to the API using cURL:
 
 ```bash
 curl -X POST "http://localhost:5017/api/webhook" \
      -H "Content-Type: application/json" \
-     -H "X-API-Key: vaš-api-klíč-zde" \
+     -H "X-API-Key: your-api-key-here" \
      -d '{
            "event": "deployment",
-           "message": "Aplikace byla úspěšně nasazena",
+           "message": "Application successfully deployed",
            "timestamp": "2025-04-14T12:00:00Z",
            "source": "CI/CD Pipeline",
            "severity": "info",
@@ -83,183 +83,183 @@ curl -X POST "http://localhost:5017/api/webhook" \
          }'
 ```
 
-### Struktura dat
+### Data Structure
 
-Webhook data mají následující strukturu:
+Webhook data has the following structure:
 
 ```json
 {
-  "event": "string",       // Typ události (povinné)
-  "message": "string",     // Zpráva (povinné)
-  "timestamp": "string",   // Časové razítko ve formátu ISO 8601 (volitelné, výchozí je aktuální čas)
-  "source": "string",      // Zdroj události (volitelné)
-  "severity": "string",    // Závažnost (volitelné, možnosti: info, warning, error, critical)
-  "data": {                // Dodatečná data (volitelné)
-    "klíč1": "hodnota1",
-    "klíč2": "hodnota2"
+  "event": "string",       // Event type (required)
+  "message": "string",     // Message (required)
+  "timestamp": "string",   // Timestamp in ISO 8601 format (optional, defaults to current time)
+  "source": "string",      // Event source (optional)
+  "severity": "string",    // Severity (optional, options: info, warning, error, critical)
+  "data": {                // Additional data (optional)
+    "key1": "value1",
+    "key2": "value2"
   }
 }
 ```
 
-### SignalR klíč
+### SignalR Key
 
-Pro připojení klientů k SignalR hubu je potřeba SignalR klíč. Tento klíč je přidán jako parametr v URL při připojování k hubu:
+To connect clients to the SignalR hub, a SignalR key is required. This key is added as a parameter in the URL when connecting to the hub:
 
 ```
-http://localhost:5017/notificationHub?signalRKey=váš-signalr-klíč-zde
+http://localhost:5017/notificationHub?signalRKey=your-signalr-key-here
 ```
 
-SignalR klíč je uložen v souboru `appsettings.json` v sekci `AppSettings.SignalRKey`.
+The SignalR key is stored in the `appsettings.json` file in the `AppSettings.SignalRKey` section.
 
 ## WebHookNotifier (Windows)
 
-WebHookNotifier je Windows desktopová aplikace, která zobrazuje notifikace na základě přijatých webhooků.
+WebHookNotifier is a Windows desktop application that displays notifications based on received webhooks.
 
-### Instalace a spuštění Windows aplikace
+### Installation and Launch (Windows Application)
 
-1. Stáhněte si nejnovější verzi z [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
-2. Rozbalte soubor `WebHookNotifier-[verze].zip`
-3. Spusťte aplikaci `WebHookNotifier.exe`
+1. Download the latest version from [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
+2. Extract the `WebHookNotifier-[version].zip` file
+3. Run the `WebHookNotifier.exe` application
 
-Aplikace se spustí a zobrazí se v systémové liště.
+The application will start and appear in the system tray.
 
-### Připojení k API
+### Connecting to the API
 
-1. Klikněte na ikonu aplikace v systémové liště pro zobrazení hlavního okna
-2. Zadejte URL API (např. `http://localhost:5017/notificationHub`)
-3. Zadejte SignalR klíč
-4. Klikněte na tlačítko "Connect"
+1. Click on the application icon in the system tray to display the main window
+2. Enter the API URL (e.g., `http://localhost:5017/notificationHub`)
+3. Enter the SignalR key
+4. Click the "Connect" button
 
-Po úspěšném připojení se zobrazí zpráva "Connected to [URL]" a aplikace začne přijímat notifikace.
+After successful connection, the message "Connected to [URL]" will be displayed, and the application will start receiving notifications.
 
-### Nastavení Windows aplikace
+### Windows Application Settings
 
-Klikněte na "Settings" v hlavním okně nebo v kontextovém menu v systémové liště pro otevření okna s nastavením.
+Click on "Settings" in the main window or in the context menu in the system tray to open the settings window.
 
-#### Nastavení notifikací
+#### Notification Settings
 
-- **Minimum seconds between notifications** - Minimální počet sekund mezi zobrazením notifikací (pro omezení počtu notifikací)
-- **Maximum queued notifications** - Maximální počet notifikací ve frontě (pro omezení počtu notifikací)
-- **Enable notification sounds** - Povolení zvuků při zobrazení notifikace
-- **Enable encryption** - Povolení šifrování dat mezi API a klientem
+- **Minimum seconds between notifications** - Minimum number of seconds between displaying notifications (to limit the number of notifications)
+- **Maximum queued notifications** - Maximum number of notifications in the queue (to limit the number of notifications)
+- **Enable notification sounds** - Enable sounds when displaying notifications
+- **Enable encryption** - Enable encryption of data between the API and client
 
-#### Nastavení historie
+#### History Settings
 
-- **Enable history tracking** - Povolení sledování historie notifikací
-- **Days to retain history** - Počet dní, po které se uchovává historie notifikací
-- **Database type** - Typ databáze pro ukládání historie (SQLite nebo SQL Server)
-- **Connection string** - Připojovací řetězec pro SQL Server (pouze pokud je vybrán SQL Server)
+- **Enable history tracking** - Enable tracking of notification history
+- **Days to retain history** - Number of days to retain notification history
+- **Database type** - Type of database for storing history (SQLite or SQL Server)
+- **Connection string** - Connection string for SQL Server (only if SQL Server is selected)
 
-### Historie notifikací (Windows)
+### Notification History (Windows)
 
-Klikněte na "View History" v hlavním okně nebo v kontextovém menu v systémové liště pro otevření okna s historií notifikací.
+Click on "View History" in the main window or in the context menu in the system tray to open the notification history window.
 
-#### Funkce historie
+#### History Features
 
-- **Vyhledávání** - Vyhledávání v historii notifikací podle obsahu
-- **Filtrování podle data** - Filtrování notifikací podle data
-- **Filtrování podle typu události** - Filtrování notifikací podle typu události
-- **Export do CSV** - Export historie do CSV souboru
-- **Export do JSON** - Export historie do JSON souboru
+- **Search** - Search notification history by content
+- **Filter by date** - Filter notifications by date
+- **Filter by event type** - Filter notifications by event type
+- **Export to CSV** - Export history to a CSV file
+- **Export to JSON** - Export history to a JSON file
 
 ## WebHookNotifierMaui (Android)
 
-WebHookNotifierMaui je multiplatformní aplikace pro Windows, Android, iOS a macOS, která zobrazuje notifikace na základě přijatých webhooků.
+WebHookNotifierMaui is a cross-platform application for Windows, Android, iOS, and macOS that displays notifications based on received webhooks.
 
-### Instalace a spuštění Android aplikace
+### Installation and Launch (Android Application)
 
-1. Stáhněte si nejnovější verzi z [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
-2. Nainstalujte APK soubor `WebHookNotifierMaui-[verze].apk` na vaše Android zařízení
-3. Spusťte aplikaci "WebHook Notifier"
+1. Download the latest version from [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
+2. Install the APK file `WebHookNotifierMaui-[version].apk` on your Android device
+3. Launch the "WebHook Notifier" application
 
-### Připojení k API (Android)
+### Connecting to the API (Android)
 
-1. Na hlavní obrazovce zadejte URL API (např. `http://192.168.1.100:5017/notificationHub`)
-   - Poznámka: Použijte IP adresu počítače, na kterém běží API, místo `localhost`
-2. Zadejte SignalR klíč
-3. Klikněte na tlačítko "Connect"
+1. On the main screen, enter the API URL (e.g., `http://192.168.1.100:5017/notificationHub`)
+   - Note: Use the IP address of the computer running the API instead of `localhost`
+2. Enter the SignalR key
+3. Click the "Connect" button
 
-Po úspěšném připojení se zobrazí zpráva "Connected to [URL]" a aplikace začne přijímat notifikace.
+After successful connection, the message "Connected to [URL]" will be displayed, and the application will start receiving notifications.
 
-### Nastavení Android aplikace
+### Android Application Settings
 
-Klikněte na ikonu nastavení v navigačním menu pro otevření obrazovky s nastavením.
+Click on the settings icon in the navigation menu to open the settings screen.
 
-#### Nastavení notifikací
+#### Notification Settings
 
-- **Minimum seconds between notifications** - Minimální počet sekund mezi zobrazením notifikací
-- **Maximum queued notifications** - Maximální počet notifikací ve frontě
-- **Enable notification sounds** - Povolení zvuků při zobrazení notifikace
-- **Enable encryption** - Povolení šifrování dat mezi API a klientem
+- **Minimum seconds between notifications** - Minimum number of seconds between displaying notifications
+- **Maximum queued notifications** - Maximum number of notifications in the queue
+- **Enable notification sounds** - Enable sounds when displaying notifications
+- **Enable encryption** - Enable encryption of data between the API and client
 
-#### Nastavení připojení
+#### Connection Settings
 
-- **Use direct WebSockets on Android** - Použití přímých WebSocketů místo SignalR na Androidu (může zlepšit výkon)
+- **Use direct WebSockets on Android** - Use direct WebSockets instead of SignalR on Android (may improve performance)
 
-#### Nastavení historie
+#### History Settings
 
-- **Enable history tracking** - Povolení sledování historie notifikací
-- **Days to retain history** - Počet dní, po které se uchovává historie notifikací
+- **Enable history tracking** - Enable tracking of notification history
+- **Days to retain history** - Number of days to retain notification history
 
-### Historie notifikací (Android)
+### Notification History (Android)
 
-Klikněte na "History" v navigačním menu pro otevření obrazovky s historií notifikací.
+Click on "History" in the navigation menu to open the notification history screen.
 
-#### Funkce historie
+#### History Features
 
-- **Vyhledávání** - Vyhledávání v historii notifikací podle obsahu
-- **Filtrování podle data** - Filtrování notifikací podle data
-- **Filtrování podle typu události** - Filtrování notifikací podle typu události
-- **Sdílení** - Sdílení vybrané notifikace
+- **Search** - Search notification history by content
+- **Filter by date** - Filter notifications by date
+- **Filter by event type** - Filter notifications by event type
+- **Share** - Share selected notification
 
 ## ApiKeyGenerator
 
-ApiKeyGenerator je nástroj pro generování API klíčů pro zabezpečení API.
+ApiKeyGenerator is a tool for generating API keys for API security.
 
-### Instalace a spuštění ApiKeyGenerator
+### Installation and Launch (ApiKeyGenerator)
 
-1. Stáhněte si nejnovější verzi z [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
-2. Rozbalte soubor `ApiKeyGenerator-[verze].zip`
-3. Spusťte aplikaci `ApiKeyGenerator.exe`
+1. Download the latest version from [GitHub Releases](https://github.com/Michal1609/WebHookReceiver/releases)
+2. Extract the `ApiKeyGenerator-[version].zip` file
+3. Run the `ApiKeyGenerator.exe` application
 
-### Použití ApiKeyGenerator
+### ApiKeyGenerator Usage
 
-1. Zadejte cestu k souboru `appsettings.json` (výchozí je `../WebHookReceiverApi/appsettings.json`)
-2. Klikněte na tlačítko "Generate API Key"
-3. Nový API klíč bude vygenerován a uložen do souboru `appsettings.json`
-4. Klíč bude také uložen do souboru `apikey.txt` pro pozdější použití
+1. Enter the path to the `appsettings.json` file (default is `../WebHookReceiverApi/appsettings.json`)
+2. Click the "Generate API Key" button
+3. A new API key will be generated and saved to the `appsettings.json` file
+4. The key will also be saved to the `apikey.txt` file for later use
 
-## Často kladené otázky
+## Frequently Asked Questions
 
-### Jak změnit port API?
+### How do I change the API port?
 
-Port API můžete změnit v souboru `WebHookReceiverApi/Properties/launchSettings.json` v sekci `profiles.WebHookReceiverApi.applicationUrl`.
+You can change the API port in the `WebHookReceiverApi/Properties/launchSettings.json` file in the `profiles.WebHookReceiverApi.applicationUrl` section.
 
-### Jak zabezpečit komunikaci pomocí HTTPS?
+### How do I secure communication using HTTPS?
 
-Pro zabezpečení komunikace pomocí HTTPS je potřeba:
+To secure communication using HTTPS, you need to:
 
-1. Vygenerovat SSL certifikát
-2. Nakonfigurovat API pro použití HTTPS v souboru `WebHookReceiverApi/Properties/launchSettings.json`
-3. Aktualizovat URL v klientských aplikacích na `https://`
+1. Generate an SSL certificate
+2. Configure the API to use HTTPS in the `WebHookReceiverApi/Properties/launchSettings.json` file
+3. Update the URL in client applications to `https://`
 
-### Jak řešit problémy s připojením na Androidu?
+### How do I troubleshoot connection issues on Android?
 
-1. Ujistěte se, že používáte správnou IP adresu počítače, na kterém běží API
-2. Zkontrolujte, zda je port API (výchozí 5017) otevřený ve firewallu
-3. Zkuste povolit "Use direct WebSockets on Android" v nastavení aplikace
-4. Zkontrolujte, zda máte správný SignalR klíč
+1. Make sure you are using the correct IP address of the computer running the API
+2. Check if the API port (default 5017) is open in the firewall
+3. Try enabling "Use direct WebSockets on Android" in the application settings
+4. Check if you have the correct SignalR key
 
-### Jak přidat vlastní typ notifikace?
+### How do I add a custom notification type?
 
-Pro přidání vlastního typu notifikace:
+To add a custom notification type:
 
-1. Upravte strukturu dat v požadavku na API podle potřeby
-2. Upravte zpracování notifikací v klientských aplikacích podle potřeby
+1. Modify the data structure in the API request as needed
+2. Modify the notification processing in client applications as needed
 
-### Jak změnit vzhled notifikací?
+### How do I change the appearance of notifications?
 
-Vzhled notifikací můžete upravit:
+You can modify the appearance of notifications:
 
-1. V Windows aplikaci v souboru `WebHookNotifier/MainWindow.xaml.cs` v metodě `FormatNotificationMessage`
-2. V Android aplikaci v souboru `WebHookNotifierMaui/Views/NotificationPage.xaml`
+1. In the Windows application, in the `WebHookNotifier/MainWindow.xaml.cs` file in the `FormatNotificationMessage` method
+2. In the Android application, in the `WebHookNotifierMaui/Views/NotificationPage.xaml` file
