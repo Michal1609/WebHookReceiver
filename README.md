@@ -40,6 +40,7 @@ This project consists of these applications that communicate in real-time:
 
 For more detailed information, please refer to the following documentation:
 
+- [Usage Guide](docs/Usage.md) - Comprehensive guide with examples and detailed instructions for all applications
 - [WebHookNotifierMaui Documentation](docs/WebHookNotifierMaui.md) - Detailed guide for the MAUI cross-platform application
 - [Configuration Guide](docs/Configuration.md) - Complete configuration options for all components
 - [Development Guide](docs/Development.md) - Information for developers who want to extend or modify the system
@@ -137,7 +138,9 @@ dotnet build -t:Run -f net9.0-maccatalyst
 
 ## 📝 Usage
 
-### 🔑 API Key Security
+### 🔑 Security
+
+#### API Key Security
 
 The API is secured using API keys. To generate a new API key, use the ApiKeyGenerator tool:
 
@@ -149,6 +152,40 @@ dotnet run
 This tool generates a new API key and updates the API configuration file. The generated key is also saved to the `apikey.txt` file.
 
 When calling the API, you need to add the `X-API-Key` header with a valid API key value.
+
+#### SignalR Key Security
+
+In addition to the API key, a SignalR key is required for clients to connect to the SignalR hub. This key is configured in the API's `appsettings.json` file in the `AppSettings.SignalRKey` section.
+
+When connecting to the SignalR hub, clients need to provide this key as a query parameter:
+
+```
+http://localhost:5017/notificationHub?signalRKey=your-signalr-key-here
+```
+
+This ensures that only authorized clients can connect to the notification hub.
+
+#### Example cURL Request
+
+```bash
+curl -X POST "http://localhost:5017/api/webhook" \
+     -H "Content-Type: application/json" \
+     -H "X-API-Key: your-api-key-here" \
+     -d '{
+           "event": "deployment",
+           "message": "Application successfully deployed",
+           "timestamp": "2025-04-14T12:00:00Z",
+           "source": "CI/CD Pipeline",
+           "severity": "info",
+           "data": {
+             "version": "1.0.0",
+             "environment": "production",
+             "duration": 120
+           }
+         }'
+```
+
+For more examples and detailed information about the API structure, see the [Usage Guide](docs/Usage.md).
 
 ### 💬 Testing Webhooks
 
