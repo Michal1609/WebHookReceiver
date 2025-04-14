@@ -63,12 +63,48 @@ jobs:
       - name: Build ApiKeyGenerator
         run: dotnet publish ApiKeyGenerator/ApiKeyGenerator.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/ApiKeyGenerator
 
+      - name: List WebHookNotifier files
+        run: Get-ChildItem -Path publish/WebHookNotifier -Recurse | Select-Object FullName
+        shell: pwsh
+
+      - name: List ApiKeyGenerator files
+        run: Get-ChildItem -Path publish/ApiKeyGenerator -Recurse | Select-Object FullName
+        shell: pwsh
+
       - name: Create WebHookNotifier ZIP
-        run: Compress-Archive -Path publish/WebHookNotifier/* -DestinationPath WebHookNotifier-${{ github.event.inputs.version }}.zip
+        run: |
+          # Najít hlavní EXE soubor
+          $exePath = Get-ChildItem -Path publish/WebHookNotifier -Filter WebHookNotifier.exe -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $exePath) {
+            $exePath = Get-ChildItem -Path publish/WebHookNotifier -Filter *.exe -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          }
+
+          if ($exePath) {
+            echo "Found EXE at: $exePath"
+            $exeDir = Split-Path -Parent $exePath
+            Compress-Archive -Path "$exeDir\*" -DestinationPath WebHookNotifier-${{ github.event.inputs.version }}.zip
+          } else {
+            echo "No EXE found, compressing all files"
+            Compress-Archive -Path publish/WebHookNotifier/* -DestinationPath WebHookNotifier-${{ github.event.inputs.version }}.zip
+          }
         shell: pwsh
 
       - name: Create ApiKeyGenerator ZIP
-        run: Compress-Archive -Path publish/ApiKeyGenerator/* -DestinationPath ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+        run: |
+          # Najít hlavní EXE soubor
+          $exePath = Get-ChildItem -Path publish/ApiKeyGenerator -Filter ApiKeyGenerator.exe -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $exePath) {
+            $exePath = Get-ChildItem -Path publish/ApiKeyGenerator -Filter *.exe -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          }
+
+          if ($exePath) {
+            echo "Found EXE at: $exePath"
+            $exeDir = Split-Path -Parent $exePath
+            Compress-Archive -Path "$exeDir\*" -DestinationPath ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+          } else {
+            echo "No EXE found, compressing all files"
+            Compress-Archive -Path publish/ApiKeyGenerator/* -DestinationPath ApiKeyGenerator-${{ github.event.inputs.version }}.zip
+          }
         shell: pwsh
 
       - name: Upload Windows artifacts
@@ -108,8 +144,21 @@ jobs:
       - name: Build API
         run: dotnet publish WebHookReceiverApi/WebHookReceiverApi.csproj -c Release -o publish/WebHookReceiverApi
 
+      - name: List API files
+        run: find publish/WebHookReceiverApi -type f | sort
+
       - name: Create API ZIP
-        run: cd publish && zip -r ../WebHookReceiverApi-${{ github.event.inputs.version }}.zip WebHookReceiverApi
+        run: |
+          # Najít hlavní DLL soubor
+          MAIN_DLL=$(find publish/WebHookReceiverApi -name "WebHookReceiverApi.dll" -type f)
+
+          if [ -n "$MAIN_DLL" ]; then
+            echo "Found main DLL at: $MAIN_DLL"
+            cd publish && zip -r ../WebHookReceiverApi-${{ github.event.inputs.version }}.zip WebHookReceiverApi
+          else
+            echo "Main DLL not found, compressing all files"
+            cd publish && zip -r ../WebHookReceiverApi-${{ github.event.inputs.version }}.zip WebHookReceiverApi
+          fi
 
       - name: Upload API artifact
         uses: actions/upload-artifact@v4
@@ -169,10 +218,18 @@ jobs:
       - name: Build MAUI Android
         run: dotnet publish WebHookNotifierMaui/WebHookNotifierMaui.csproj -f net9.0-android -c Release -o publish/WebHookNotifierMaui
 
+      - name: List MAUI Android files
+        run: Get-ChildItem -Path publish/WebHookNotifierMaui -Recurse | Select-Object FullName
+        shell: pwsh
+
       - name: Locate APK file
         id: locate-apk
         run: |
           $apkPath = Get-ChildItem -Path publish/WebHookNotifierMaui -Filter *.apk -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $apkPath) {
+            echo "No APK file found in the output directory!"
+            exit 1
+          }
           echo "APK_PATH=$apkPath" >> $env:GITHUB_ENV
           echo "Found APK at: $apkPath"
         shell: pwsh
@@ -182,6 +239,18 @@ jobs:
           $destination = "WebHookNotifierMaui-${{ github.event.inputs.version }}.apk"
           Copy-Item -Path $env:APK_PATH -Destination $destination
           echo "Final APK: $destination"
+
+          # Verify the APK exists and has content
+          if (Test-Path $destination) {
+            $fileSize = (Get-Item $destination).Length
+            echo "APK file size: $fileSize bytes"
+            if ($fileSize -lt 1000) {
+              echo "Warning: APK file is suspiciously small!"
+            }
+          } else {
+            echo "Error: Final APK file does not exist!"
+            exit 1
+          }
         shell: pwsh
 
       - name: Upload MAUI Android artifact
